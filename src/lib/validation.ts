@@ -44,6 +44,9 @@ export const SettingsSchema = z.object({
   name: z.string().max(100).nullable().optional(),
   emailNotificationsEnabled: z.boolean(),
   minScoreEmailNotif: z.number().int().min(0).max(100).default(50),
+  preferredLanguage: z.enum([
+    'Russian', 'English', 'Kazakh', 'Uzbek', 'Belarusian', 'Ukrainian', 'German', 'French', 'Spanish', 'Chinese',
+  ]).default('Russian'),
 })
 
 export const ThemeSchema = z.object({

@@ -33,6 +33,7 @@ model User {
   emailNotificationsEnabled Boolean          @default(true)
   minScoreEmailNotif        Int              @default(50)
   preferredTheme            String           @default("dark")
+  preferredLanguage         String           @default("Russian")
   createdAt                 DateTime         @default(now())
   updatedAt                 DateTime         @updatedAt
 

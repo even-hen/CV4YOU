@@ -37,6 +37,7 @@ export async function runScoringPipeline(applicationId: string): Promise<void> {
                 email: true,
                 name: true,
                 emailNotificationsEnabled: true,
+                preferredLanguage: true,
               },
             },
           },
@@ -55,6 +56,7 @@ export async function runScoringPipeline(applicationId: string): Promise<void> {
       mandatoryRequirements: v.mandatoryRequirements,
       niceToHave: v.niceToHave || '',
       cvText: app.extractedText,
+      language: v.recruiter.preferredLanguage,
     })
 
     // 3 — Auto-purge low-scoring applications

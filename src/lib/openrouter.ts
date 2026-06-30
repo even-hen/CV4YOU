@@ -113,9 +113,11 @@ export async function scoreCVAgainstVacancy(params: {
   mandatoryRequirements: string
   niceToHave: string
   cvText: string
+  language?: string
 }): Promise<LLMScoreResult> {
+  const language = params.language || 'Russian'
   const systemPrompt = `You are an expert HR analyst. Evaluate a candidate's CV against a job vacancy.
-Return ONLY a valid JSON object with this exact shape (no markdown, no extra text) and values in Russian:
+Return ONLY a valid JSON object with this exact shape (no markdown, no extra text) and all text values in ${language}:
 {
   "overallScore": <integer 0-100>,
   "summary": "<2-3 sentence overview>",

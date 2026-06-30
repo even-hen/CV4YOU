@@ -30,6 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           trialEndsAt: user.trialEndsAt.toISOString(),
           subscriptionEndsAt: user.subscriptionEndsAt?.toISOString() ?? null,
           preferredTheme: user.preferredTheme,
+          preferredLanguage: user.preferredLanguage,
           emailNotificationsEnabled: user.emailNotificationsEnabled,
           minScoreEmailNotif: user.minScoreEmailNotif,
         }
@@ -48,6 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.trialEndsAt = dbUser.trialEndsAt.toISOString()
           token.subscriptionEndsAt = dbUser.subscriptionEndsAt?.toISOString() ?? null
           token.preferredTheme = dbUser.preferredTheme
+          token.preferredLanguage = dbUser.preferredLanguage
           token.emailNotificationsEnabled = dbUser.emailNotificationsEnabled
           token.minScoreEmailNotif = dbUser.minScoreEmailNotif
         }
@@ -59,6 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.trialEndsAt = user.trialEndsAt
         token.subscriptionEndsAt = user.subscriptionEndsAt
         token.preferredTheme = user.preferredTheme
+        token.preferredLanguage = user.preferredLanguage
         token.emailNotificationsEnabled = user.emailNotificationsEnabled
         token.minScoreEmailNotif = user.minScoreEmailNotif
       }
@@ -74,6 +77,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.trialEndsAt = token.trialEndsAt
         session.user.subscriptionEndsAt = token.subscriptionEndsAt
         session.user.preferredTheme = token.preferredTheme
+        session.user.preferredLanguage = token.preferredLanguage
         session.user.emailNotificationsEnabled = token.emailNotificationsEnabled
         session.user.minScoreEmailNotif = token.minScoreEmailNotif
       }

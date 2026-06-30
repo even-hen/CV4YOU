@@ -18,6 +18,7 @@ export async function GET() {
       subscriptionTier: true,
       emailNotificationsEnabled: true,
       minScoreEmailNotif: true,
+      preferredLanguage: true,
     },
   })
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid input data', details: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
-  const { name, emailNotificationsEnabled, minScoreEmailNotif } = parsed.data
+  const { name, emailNotificationsEnabled, minScoreEmailNotif, preferredLanguage } = parsed.data
 
   await prisma.user.update({
     where: { id: session.user.id as string },
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
       name: name || null,
       emailNotificationsEnabled,
       minScoreEmailNotif,
+      preferredLanguage,
     },
   })
 

@@ -11,6 +11,7 @@ export default function SettingsPage() {
   const [emailNotif, setEmailNotif] = useState<boolean>(user?.emailNotificationsEnabled ?? true)
   const [minScoreNotif, setMinScoreNotif] = useState<number>(user?.minScoreEmailNotif ?? 50)
   const [name, setName] = useState<string>(user?.name || '')
+  const [lang, setLang] = useState<string>(user?.preferredLanguage ?? 'Russian')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -21,10 +22,10 @@ export default function SettingsPage() {
       const res = await fetch('/api/user/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, emailNotificationsEnabled: emailNotif, minScoreEmailNotif: minScoreNotif }),
+        body: JSON.stringify({ name, emailNotificationsEnabled: emailNotif, minScoreEmailNotif: minScoreNotif, preferredLanguage: lang }),
       })
       if (!res.ok) throw new Error('Failed to save')
-      await update({ name, emailNotificationsEnabled: emailNotif, minScoreEmailNotif: minScoreNotif })
+      await update({ name, emailNotificationsEnabled: emailNotif, minScoreEmailNotif: minScoreNotif, preferredLanguage: lang })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch {
@@ -70,6 +71,23 @@ export default function SettingsPage() {
             <div className="settings-row-desc">Used for account login and notifications</div>
           </div>
           <span className="text-muted text-sm">{user?.email}</span>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <div className="settings-row-label">AI evaluation language</div>
+            <div className="settings-row-desc">Language used by AI to analyze CVs and write summaries</div>
+          </div>
+          <select
+            className="form-input"
+            style={{ maxWidth: 240, cursor: 'pointer' }}
+            value={lang}
+            onChange={e => setLang(e.target.value)}
+          >
+            {['Russian', 'English', 'Kazakh', 'Uzbek', 'Belarusian', 'Ukrainian', 'German', 'French', 'Spanish', 'Chinese'].map(l => (
+              <option key={l} value={l}>{l}</option>
+            ))}
+          </select>
         </div>
       </div>
 
