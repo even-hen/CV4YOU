@@ -8,6 +8,7 @@ declare module 'next-auth' {
     trialEndsAt: string
     subscriptionEndsAt: string | null
     preferredTheme: string
+    preferredLanguage: string
     emailNotificationsEnabled: boolean
     minScoreEmailNotif: number
   }
@@ -19,6 +20,7 @@ declare module 'next-auth' {
       trialEndsAt: string
       subscriptionEndsAt: string | null
       preferredTheme: string
+      preferredLanguage: string
       emailNotificationsEnabled: boolean
       minScoreEmailNotif: number
     } & DefaultSession['user']
@@ -32,6 +34,7 @@ declare module 'next-auth/jwt' {
     trialEndsAt: string
     subscriptionEndsAt: string | null
     preferredTheme: string
+    preferredLanguage: string
     emailNotificationsEnabled: boolean
     minScoreEmailNotif: number
   }
