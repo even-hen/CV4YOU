@@ -18,7 +18,7 @@ const PLANS = [
     name: 'Basic',
     limit: '10 active vacancies',
     features: ['Up to 10 active vacancies', 'AI CV matching & scoring', 'Candidate management', 'Email notifications', 'On-demand CV generation'],
-    prices: { '1m': 1490, '3m': 3990, '1y': 12990 },
+    prices: { '1m': 149, '3m': 399, '1y': 1299 },
     recommended: false,
   },
   {
@@ -26,7 +26,7 @@ const PLANS = [
     name: 'Pro',
     limit: '30 active vacancies',
     features: ['Up to 30 active vacancies', 'AI CV matching & scoring', 'Candidate management', 'Email notifications', 'On-demand CV generation', 'Priority support'],
-    prices: { '1m': 2990, '3m': 7990, '1y': 24990 },
+    prices: { '1m': 299, '3m': 799, '1y': 2499 },
     recommended: true,
   },
 ] as const

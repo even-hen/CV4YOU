@@ -24,12 +24,12 @@ export const PLAN_TIER: Record<string, SubscriptionTier> = {
 }
 
 export const PLAN_PRICES_RUB: Record<string, number> = {
-  basic_1m: 1490,
-  basic_3m: 3990,
-  basic_1y: 12990,
-  pro_1m: 2990,
-  pro_3m: 7990,
-  pro_1y: 24990,
+  basic_1m: 149,
+  basic_3m: 399,
+  basic_1y: 1299,
+  pro_1m: 299,
+  pro_3m: 799,
+  pro_1y: 2499,
 }
 
 export function isAccessActive(user: Pick<User, 'trialEndsAt' | 'subscriptionEndsAt'>): boolean {
