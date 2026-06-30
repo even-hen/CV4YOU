@@ -1,0 +1,15 @@
+uid=1_0 RootWebArea "CV4YOU" url="http://localhost:3000/login"
+  uid=1_1 StaticText "CV4YOU"
+  uid=1_2 heading "Welcome back" level="1"
+  uid=1_3 StaticText "Sign in to your recruiter account"
+  uid=1_4 StaticText "EMAIL"
+  uid=1_5 textbox "EMAIL" required
+  uid=1_6 StaticText "PASSWORD"
+  uid=1_7 textbox "PASSWORD" required
+  uid=1_8 button "Toggle password visibility"
+  uid=1_9 button "Sign in"
+  uid=1_10 StaticText "Don't have an account?"
+  uid=1_11 link "Create one free" url="http://localhost:3000/register"
+    uid=1_12 StaticText "Create one free"
+  uid=1_13 button "Open Next.js Dev Tools" expandable haspopup="menu"
+  uid=1_14 alert atomic live="assertive" relevant="additions text"

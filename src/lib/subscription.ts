@@ -1,0 +1,69 @@
+import { User, SubscriptionTier } from '@prisma/client'
+
+export const PLAN_LIMITS: Record<SubscriptionTier, number> = {
+  BASIC: 10,
+  PRO: 30,
+}
+
+export const PLAN_DAYS: Record<string, number> = {
+  basic_1m: 30,
+  basic_3m: 90,
+  basic_1y: 365,
+  pro_1m: 30,
+  pro_3m: 90,
+  pro_1y: 365,
+}
+
+export const PLAN_TIER: Record<string, SubscriptionTier> = {
+  basic_1m: 'BASIC',
+  basic_3m: 'BASIC',
+  basic_1y: 'BASIC',
+  pro_1m: 'PRO',
+  pro_3m: 'PRO',
+  pro_1y: 'PRO',
+}
+
+export const PLAN_PRICES_RUB: Record<string, number> = {
+  basic_1m: 1490,
+  basic_3m: 3990,
+  basic_1y: 12990,
+  pro_1m: 2990,
+  pro_3m: 7990,
+  pro_1y: 24990,
+}
+
+export function isAccessActive(user: Pick<User, 'trialEndsAt' | 'subscriptionEndsAt'>): boolean {
+  const now = new Date()
+  if (user.trialEndsAt > now) return true
+  if (user.subscriptionEndsAt && user.subscriptionEndsAt > now) return true
+  return false
+}
+
+export function getTrialDaysLeft(trialEndsAt: Date): number {
+  const now = new Date()
+  const diff = trialEndsAt.getTime() - now.getTime()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+}
+
+export function getSubscriptionDaysLeft(subscriptionEndsAt: Date | null): number {
+  if (!subscriptionEndsAt) return 0
+  const now = new Date()
+  const diff = subscriptionEndsAt.getTime() - now.getTime()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+}
+
+export function getActiveVacancyLimit(tier: SubscriptionTier): number {
+  return PLAN_LIMITS[tier]
+}
+
+export function extendSubscription(
+  user: Pick<User, 'subscriptionEndsAt'>,
+  daysToAdd: number
+): Date {
+  const now = new Date()
+  const base =
+    user.subscriptionEndsAt && user.subscriptionEndsAt > now
+      ? user.subscriptionEndsAt
+      : now
+  return new Date(base.getTime() + daysToAdd * 24 * 60 * 60 * 1000)
+}

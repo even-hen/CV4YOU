@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  BASIC
+  PRO
+}
+
+enum ApplicationStatus {
+  PENDING
+  REJECTED_KNOCKOUT
+  SCORED
+  FAILED_SCORING
+}
+
+model User {
+  id                        String           @id @default(cuid())
+  email                     String           @unique
+  name                      String?
+  passwordHash              String
+  subscriptionTier          SubscriptionTier @default(BASIC)
+  trialEndsAt               DateTime
+  subscriptionEndsAt        DateTime?
+  emailNotificationsEnabled Boolean          @default(true)
+  minScoreEmailNotif        Int              @default(50)
+  preferredTheme            String           @default("dark")
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
+
+  vacancies     Vacancy[]
+  notifications Notification[]
+  payments      PaymentTransaction[]
+}
+
+model Vacancy {
+  id          String @id @default(cuid())
+  recruiterId String
+  recruiter   User   @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  company               String
+  role                  String
+  responsibilities      String
+  baseRequirements      String
+  mandatoryRequirements String
+  niceToHave            String @default("")
+
+  // JSON array of strings e.g. ["phone","telegram","email"]
+  requestedContacts String @default("[]")
+
+  // "optional" | "required" | null = disabled
+  salaryExpectation String?
+
+  // JSON array of { question, options: string[], correctAnswer: string }
+  knockoutQuestions String @default("[]")
+
+  linkEnabled Boolean @default(true)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications CandidateApplication[]
+
+  @@index([recruiterId, isActive])
+}
+
+model CandidateApplication {
+  id        String  @id @default(cuid())
+  vacancyId String
+  vacancy   Vacancy @relation(fields: [vacancyId], references: [id], onDelete: Cascade)
+
+  candidateName String
+  // JSON object e.g. { phone: "...", telegram: "...", email: "..." }
+  contacts      String @default("{}")
+  // Salary expectation provided by candidate
+  salaryExpectation String?
+  // JSON array of { question, answer }
+  knockoutAnswers   String @default("[]")
+  // Plain text extracted from uploaded CV
+  extractedText     String
+  // Cached LLM-generated structured CV
+  structuredCV      String?
+
+  status    ApplicationStatus @default(PENDING)
+  // JSON: { overallScore, summary, pros, cons, breakdown }
+  llmScore  String?
+
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vacancyId, status])
+  @@index([vacancyId, seen])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  recruiterId String
+  recruiter   User     @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([recruiterId, read])
+}
+
+model PaymentTransaction {
+  id          String @id @default(cuid())
+  recruiterId String
+  recruiter   User   @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  yookassaPaymentId String @unique
+  status            String // "pending" | "succeeded" | "canceled"
+  amount            Float
+  currency          String @default("RUB")
+  // "basic_1m" | "basic_3m" | "basic_1y" | "pro_1m" | "pro_3m" | "pro_1y"
+  planKey           String
+  daysGranted       Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
