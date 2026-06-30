@@ -10,8 +10,10 @@
     "lint": "eslint",
     "prism": "prisma studio"
   },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "16.2.9"
+  },
   "dependencies": {
-    "@next/swc-win32-x64-msvc": "16.2.9",
     "@prisma/client": "^6.19.3",
     "@types/nodemailer": "^8.0.1",
     "lucide-react": "^1.21.0",
