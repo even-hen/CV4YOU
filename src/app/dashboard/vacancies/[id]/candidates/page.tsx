@@ -269,7 +269,7 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="candidates-page" style={{ maxWidth: 960, margin: '0 auto', width: '100%', padding: '0 16px' }}>
+    <div className="candidates-page" style={{ maxWidth: 960, margin: '0 auto', width: '100%' }}>
       {/* Header */}
       <div className="candidates-header" style={{ marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0px 10px', alignItems: 'center' }}>
