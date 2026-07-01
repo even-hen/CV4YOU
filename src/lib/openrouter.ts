@@ -130,12 +130,13 @@ Scoring rules:
 - Nice-to-have requirements are bonus points.
 - Be honest and precise. Do not inflate scores.`
 
+  const responsibilitiesBlock = params.responsibilities
+    ? `**Responsibilities:**\n${params.responsibilities}\n\n`
+    : ''
+
   const userPrompt = `## Job Vacancy
 
-**Responsibilities:**
-${params.responsibilities}
-
-**Base Requirements:**
+${responsibilitiesBlock}**Base Requirements:**
 ${params.baseRequirements}
 
 **Mandatory Requirements:**

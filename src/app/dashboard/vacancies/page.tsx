@@ -107,8 +107,6 @@ export default function VacanciesPage() {
 
   useEffect(() => { fetchVacancies(1, false) }, [fetchVacancies])
 
-
-
   async function copyLink(v: Vacancy) {
     const url = `${window.location.origin}/jobs/${v.id}`
     await navigator.clipboard.writeText(url)
