@@ -154,6 +154,10 @@ export default function CandidatesPage() {
   }
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [vacancyId])
+
+  useEffect(() => {
     fetchCandidates(1, false)
   }, [fetchCandidates])
 

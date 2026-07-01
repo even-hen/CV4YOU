@@ -353,8 +353,8 @@ function VacancyCard({ vacancy: v, copiedId, onEdit, onViewApps, onCopyLink }: C
     <div className="vacancy-card" onClick={onViewApps} style={{ cursor: 'pointer' }} title="Click to view applications">
       <div className="vacancy-card-header">
         <div style={{ minWidth: 0 }}>
-          <div className="vacancy-company">{v.company}</div>
           <div className="vacancy-role">{v.role}</div>
+          <div className="vacancy-company">{v.company}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {v.newApplications > 0 && (
