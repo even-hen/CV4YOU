@@ -33,4 +33,4 @@ jobs:
             npm run build
             
             # Restart the project in PM2 or start it if it's not running yet
-            pm2 restart cv4you --update-env || pm2 start npm --name "cv4you" -- run start
+            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start npm --name "cv4you" -- run start
