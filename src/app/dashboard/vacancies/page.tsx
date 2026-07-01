@@ -207,7 +207,7 @@ export default function VacanciesPage() {
           </div>
 
           {/* Search */}
-          <div className="search-wrapper" style={{ flex: 1, minWidth: 160, maxWidth: 320 }}>
+          <div className="search-wrapper" style={{ flex: 1, minWidth: 160, maxWidth: 450 }}>
             <Search size={15} className="search-icon" />
             <input
               type="text"
