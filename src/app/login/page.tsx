@@ -39,7 +39,6 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">CV4YOU</div>
-        <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">Sign in to your recruiter account</p>
 
         {error && (
