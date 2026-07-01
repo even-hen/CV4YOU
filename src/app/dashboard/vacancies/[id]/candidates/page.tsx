@@ -440,7 +440,53 @@ export default function CandidatesPage() {
                 {/* Expanded detail */}
                 {expanded === c.id && (
                   <div className="candidate-detail">
-                    {/* Actions bar — moved to top aligned right */}
+
+                    {/* Failed AI Scoring Alert Banner */}
+                    {c.status === 'FAILED_SCORING' && (
+                      <div style={{
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        marginBottom: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
+                          <AlertTriangle size={16} />
+                          AI Resume Evaluation Failed
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
+                          The system failed to evaluate this resume with the AI model. You can review the candidate's contacts or manually trigger a retry.
+                        </p>
+                        <div>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            style={{ padding: '4px 12px', fontSize: '0.8rem', height: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                            onClick={() => retryScoring(c.id)}
+                            disabled={retrying === c.id}
+                          >
+                            {retrying === c.id ? (
+                              <Loader2 size={12} className="spin" />
+                            ) : (
+                              <RefreshCw size={12} />
+                            )}
+                            Retry AI Scoring
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Summary */}
+                    {c.summary && (
+                      <div className="candidate-summary">
+                        <p>{c.summary}</p>
+                      </div>
+                    )}
+
+                    {/* Actions bar — moved below summary */}
                     <div className="candidate-actions" style={{ justifyContent: 'flex-end' }}>
                       {c.status === 'FAILED_SCORING' && (
                         <button
@@ -496,60 +542,6 @@ export default function CandidatesPage() {
                         )}
                       </button>
                     </div>
-
-                    {/* Failed AI Scoring Alert Banner */}
-                    {c.status === 'FAILED_SCORING' && (
-                      <div style={{
-                        background: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
-                          <AlertTriangle size={16} />
-                          AI Resume Evaluation Failed
-                        </div>
-                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
-                          The system failed to evaluate this resume with the AI model. You can review the candidate's contacts or manually trigger a retry.
-                        </p>
-                        <div>
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            style={{ padding: '4px 12px', fontSize: '0.8rem', height: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                            onClick={() => retryScoring(c.id)}
-                            disabled={retrying === c.id}
-                          >
-                            {retrying === c.id ? (
-                              <Loader2 size={12} className="spin" />
-                            ) : (
-                              <RefreshCw size={12} />
-                            )}
-                            Retry AI Scoring
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Summary */}
-                    {c.summary && (
-                      <div className="candidate-summary">
-                        <p>{c.summary}</p>
-                      </div>
-                    )}
-
-                    {/* Score breakdown */}
-                    {c.breakdown && (
-                      <div className="candidate-breakdown">
-                        <h4 className="detail-section-title">Score Breakdown</h4>
-                        <ScoreBar value={c.breakdown.baseRequirements} label="Base requirements" />
-                        <ScoreBar value={c.breakdown.niceToHave} label="Nice to have" />
-                      </div>
-                    )}
 
                     {/* Pros & Cons */}
                     <div className="candidate-proscons">
