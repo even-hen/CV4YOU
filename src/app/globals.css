@@ -1532,7 +1532,7 @@ select {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
 }
 
 /* ── Knockout Question Builder ───────────────────────────────── */
