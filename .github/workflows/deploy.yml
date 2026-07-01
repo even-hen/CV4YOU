@@ -1,0 +1,36 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Beget VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/cv4you
+            
+            # Fetch latest code
+            git pull origin main
+            
+            # Install production/development dependencies
+            npm install
+            
+            # Run database migrations (Prisma)
+            npx prisma migrate deploy
+            
+            # Build Next.js application
+            npm run build
+            
+            # Restart the project in PM2 or start it if it's not running yet
+            pm2 restart cv4you --update-env || pm2 start npm --name "cv4you" -- run start
