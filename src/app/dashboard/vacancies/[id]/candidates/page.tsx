@@ -346,7 +346,7 @@ export default function CandidatesPage() {
               style={{ gap: 6 }}
             >
               <ArrowUpDown size={14} />
-              <span>{sort === 'score' ? 'Score' : sort === 'date' ? 'New' : 'Name A–Z'}</span>
+              <span>{sort === 'score' ? 'Score' : sort === 'date' ? 'New' : 'Name'}</span>
               <ChevronDown size={13} />
             </button>
             {sortOpen && (
@@ -363,7 +363,7 @@ export default function CandidatesPage() {
                   >
                     {sort === k && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
                     {sort !== k && <span style={{ width: 14 }} />}
-                    {k === 'score' ? 'Score' : k === 'date' ? 'New' : 'Name A–Z'}
+                    {k === 'score' ? 'Score' : k === 'date' ? 'New' : 'Name'}
                   </button>
                 ))}
               </div>
@@ -466,7 +466,7 @@ export default function CandidatesPage() {
                         {deleting === c.id ? (
                           <Loader2 size={14} className="spin" />
                         ) : (
-                          <><Trash2 size={14} /> Remove</>
+                          <><Trash2 size={14} /> Delete</>
                         )}
                       </button>
                       <button
@@ -478,7 +478,7 @@ export default function CandidatesPage() {
                         {downloading === c.id ? (
                           <><Loader2 size={14} className="spin" /> Generating…</>
                         ) : (
-                          <><Download size={14} /> Resume</>
+                          <><Download size={14} /> Download</>
                         )}
                       </button>
                       <button

@@ -20,16 +20,21 @@ interface Notification {
 
 interface NavbarProps {
   title?: string
-  notifications: Notification[]
   unreadCount: number
   onMarkAllRead: () => void
 }
 
-export function Navbar({ title, notifications, unreadCount, onMarkAllRead }: NavbarProps) {
+export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
   const { data: session } = useSession()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [skip, setSkip] = useState(0)
+
   const menuRef = useRef<HTMLDivElement>(null)
   const bellRef = useRef<HTMLDivElement>(null)
   const user = session?.user
@@ -51,6 +56,58 @@ export function Navbar({ title, notifications, unreadCount, onMarkAllRead }: Nav
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  // Fetch initial notifications when bell is opened
+  useEffect(() => {
+    if (!bellOpen) return
+    
+    async function fetchInitialNotifications() {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/notifications?skip=0&take=5')
+        if (res.ok) {
+          const data = await res.json()
+          setNotifications(data.notifications)
+          setHasMore(data.hasMore)
+          setSkip(5)
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchInitialNotifications()
+  }, [bellOpen])
+
+  async function loadMore() {
+    if (loadingMore || !hasMore) return
+    setLoadingMore(true)
+    try {
+      const res = await fetch(`/api/notifications?skip=${skip}&take=5`)
+      if (res.ok) {
+        const data = await res.json()
+        setNotifications(prev => [...prev, ...data.notifications])
+        setHasMore(data.hasMore)
+        setSkip(prev => prev + 5)
+      }
+    } catch (err) {
+      console.error('Failed to load more notifications', err)
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  async function handleMarkAllRead() {
+    // Clear list locally immediately
+    setNotifications([])
+    setHasMore(false)
+    setSkip(0)
+    // Notify layout and call actual api
+    await onMarkAllRead()
+    window.dispatchEvent(new CustomEvent('cv4you-refresh-notif-count'))
+  }
 
   function toggleTheme() {
     const next = currentTheme === 'dark' ? 'light' : 'dark'
@@ -85,27 +142,44 @@ export function Navbar({ title, notifications, unreadCount, onMarkAllRead }: Nav
               <div className="notif-header">
                 <span className="font-semibold">Notifications</span>
                 {unreadCount > 0 && (
-                  <button className="btn btn-ghost btn-sm" onClick={onMarkAllRead}>Mark all read</button>
+                  <button className="btn btn-ghost btn-sm" onClick={handleMarkAllRead}>Mark all read</button>
                 )}
               </div>
               <div className="notif-list">
-                {notifications.length === 0
-                  ? <div className="notif-empty"><BellOff size={20} /><span>No notifications yet</span></div>
-                  : notifications.slice(0, 10).map(n => (
-                    <a
-                      key={n.id}
-                      href={n.link || '/dashboard/vacancies'}
-                      className={`notif-item${n.read ? '' : ' unread'}`}
-                      onClick={() => setBellOpen(false)}
-                    >
-                      <span className="notif-dot" />
-                      <div>
-                        <p className="notif-msg">{n.message}</p>
-                        <p className="notif-time">{new Date(n.createdAt).toLocaleDateString()}</p>
-                      </div>
-                    </a>
-                  ))
-                }
+                {loading ? (
+                  <div className="notif-empty"><div className="notif-spinner" /></div>
+                ) : notifications.length === 0 ? (
+                  <div className="notif-empty">
+                    <BellOff size={20} />
+                    <span>You&apos;re all caught up</span>
+                  </div>
+                ) : (
+                  <>
+                    {notifications.map(n => (
+                      <a
+                        key={n.id}
+                        href={n.link || '/dashboard/vacancies'}
+                        className={`notif-item${n.read ? '' : ' unread'}`}
+                        onClick={() => setBellOpen(false)}
+                      >
+                        <span className="notif-dot" />
+                        <div>
+                          <p className="notif-msg">{n.message}</p>
+                          <p className="notif-time">{new Date(n.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </a>
+                    ))}
+                    {hasMore && (
+                      <button 
+                        className="notif-load-more" 
+                        onClick={loadMore} 
+                        disabled={loadingMore}
+                      >
+                        {loadingMore ? 'Loading...' : 'Show 5 more'}
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           )}

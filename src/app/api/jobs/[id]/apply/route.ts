@@ -81,17 +81,9 @@ export async function POST(req: NextRequest, { params }: Params) {
     },
   })
 
-  // In-app notification for recruiter
+  // Fire-and-forget AI scoring via setImmediate — detaches from request lifecycle
+  // In-app notification is sent inside the scoring pipeline ONLY if the candidate passes (score ≥ threshold)
   if (!isKnockout) {
-    await prisma.notification.create({
-      data: {
-        recruiterId: vacancy.recruiterId,
-        message: `New application from ${candidateName.trim()} for ${vacancy.role} at ${vacancy.company}`,
-        link: `/dashboard/vacancies/${vacancyId}/candidates`,
-      },
-    })
-
-    // Fire-and-forget AI scoring via setImmediate — detaches from request lifecycle
     const appId = application.id
     setImmediate(() => {
       runScoringPipeline(appId).catch(e =>

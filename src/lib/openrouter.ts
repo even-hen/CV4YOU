@@ -122,11 +122,7 @@ Return ONLY a valid JSON object with this exact shape (no markdown, no extra tex
   "overallScore": <integer 0-100>,
   "summary": "<2-3 sentence overview>",
   "pros": ["<strength 1>", "<strength 2>", ...],
-  "cons": ["<gap 1>", "<gap 2>", ...],
-  "breakdown": {
-    "baseRequirements": <integer 0-100>,
-    "niceToHave": <integer 0-100>
-  }
+  "cons": ["<gap 1>", "<gap 2>", ...]
 }
 Scoring rules:
 - Mandatory requirements carry the highest weight. Missing any mandatory requirement significantly lowers the score.

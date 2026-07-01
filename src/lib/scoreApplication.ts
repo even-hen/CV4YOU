@@ -77,7 +77,16 @@ export async function runScoringPipeline(applicationId: string): Promise<void> {
 
     console.log(`[scoring] Scored application ${applicationId}: ${score.overallScore}/100`)
 
-    // 5 — Email notification (optional, fire-and-forget)
+    // 5 — In-app notification for recruiter (candidate passed — will appear in the list)
+    await prisma.notification.create({
+      data: {
+        recruiterId: v.recruiterId,
+        message: `New application from ${app.candidateName} for ${v.role} at ${v.company}`,
+        link: `/dashboard/vacancies/${app.vacancyId}/candidates`,
+      },
+    })
+
+    // 6 — Email notification (optional, fire-and-forget)
     const minScore = (v.recruiter as any).minScoreEmailNotif ?? 50
     if (v.recruiter.emailNotificationsEnabled && score.overallScore >= minScore) {
       sendEmailNotification({

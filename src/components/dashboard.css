@@ -96,6 +96,43 @@
   font-size: 0.875rem;
 }
 
+.notif-load-more {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--color-border-subtle);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition);
+  text-align: center;
+}
+
+.notif-load-more:hover:not(:disabled) {
+  background: var(--color-surface-2);
+}
+
+.notif-load-more:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notif-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 8px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Theme switch in user menu */
 .theme-switch {
   position: relative;

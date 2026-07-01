@@ -38,9 +38,15 @@ export async function GET(req: NextRequest) {
         ? { role: 'asc' }
         : { createdAt: 'desc' },
     include: {
-      _count: { select: { applications: true } },
+      _count: {
+        select: {
+          applications: {
+            where: { status: 'SCORED' },
+          },
+        },
+      },
       applications: {
-        where: { seen: false },
+        where: { seen: false, status: 'SCORED' },
         select: { id: true },
       },
     },

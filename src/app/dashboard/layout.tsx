@@ -17,7 +17,7 @@ interface Notification {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status, update } = useSession()
   const router = useRouter()
-  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [unreadCount, setUnreadCount] = useState<number>(0)
   const [dbUser, setDbUser] = useState<any>(null)
   const syncedRef = useRef(false)
 
@@ -43,39 +43,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (status === 'unauthenticated') router.push('/login')
   }, [status, router])
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchUnreadCount = useCallback(async () => {
     if (!session) return
     try {
-      const res = await fetch('/api/notifications')
+      const res = await fetch('/api/notifications?countOnly=true')
       if (res.ok) {
-        setNotifications(await res.json())
+        const { count } = await res.json()
+        setUnreadCount(count)
         window.dispatchEvent(new CustomEvent('cv4you-notif-update'))
       }
     } catch {}
   }, [session])
 
   useEffect(() => {
-    fetchNotifications()
-    let interval = setInterval(fetchNotifications, 60000) // Poll every 60s
+    fetchUnreadCount()
+    let interval = setInterval(fetchUnreadCount, 60000) // Poll every 60s
     
     function handleVisibility() {
       clearInterval(interval)
       if (!document.hidden) {
-        fetchNotifications() // Trigger immediate fetch when focused
-        interval = setInterval(fetchNotifications, 60000)
+        fetchUnreadCount() // Trigger immediate fetch when focused
+        interval = setInterval(fetchUnreadCount, 60000)
       }
     }
 
+    // Listen for custom event to trigger immediate count refresh (e.g. after marking notifications read in Navbar)
+    function handleNotifRefresh() {
+      fetchUnreadCount()
+    }
+
     document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('cv4you-refresh-notif-count', handleNotifRefresh)
     return () => {
       clearInterval(interval)
       document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('cv4you-refresh-notif-count', handleNotifRefresh)
     }
-  }, [fetchNotifications])
+  }, [fetchUnreadCount])
 
   async function markAllRead() {
     await fetch('/api/notifications/read-all', { method: 'POST' })
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    setUnreadCount(0)
   }
 
   if (status === 'loading') {
@@ -96,12 +104,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     subscriptionEndsAt: subscriptionEndsAt ? new Date(subscriptionEndsAt) : null,
   })
 
-  const unreadCount = notifications.filter(n => !n.read).length
-
   return (
     <div className="dashboard-shell">
       <Navbar
-        notifications={notifications}
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
       />

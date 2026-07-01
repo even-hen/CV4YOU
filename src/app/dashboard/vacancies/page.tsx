@@ -166,7 +166,7 @@ export default function VacanciesPage() {
   const SORT_LABELS: Record<SortKey, string> = {
     recent: 'Newest first',
     new_apps: 'Applications',
-    name: 'Name A–Z',
+    name: 'Name',
   }
 
   return (
