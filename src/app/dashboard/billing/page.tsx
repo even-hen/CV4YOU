@@ -97,7 +97,6 @@ function BillingContent() {
               onClick={() => setDuration(d.key)}
             >
               {d.label}
-              {d.saving && <span style={{ fontSize: '0.6875rem', marginLeft: 4, color: 'var(--color-success)' }}>{d.saving}</span>}
             </button>
           ))}
         </div>
