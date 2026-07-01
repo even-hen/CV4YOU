@@ -315,8 +315,8 @@ export default function VacanciesPage() {
         className="btn btn-primary"
         style={{
           position: 'fixed',
-          bottom: 84,
-          right: 24,
+          bottom: 40,
+          right: 20,
           zIndex: 100,
           borderRadius: '50%',
           width: 54,
