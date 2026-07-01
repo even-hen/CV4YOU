@@ -44,16 +44,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [status, router])
 
   const fetchUnreadCount = useCallback(async () => {
-    if (!session) return
+    if (status !== 'authenticated') return
     try {
       const res = await fetch('/api/notifications?countOnly=true')
       if (res.ok) {
         const { count } = await res.json()
         setUnreadCount(count)
-        window.dispatchEvent(new CustomEvent('cv4you-notif-update'))
       }
     } catch {}
-  }, [session])
+  }, [status])
 
   useEffect(() => {
     fetchUnreadCount()

@@ -107,13 +107,7 @@ export default function VacanciesPage() {
 
   useEffect(() => { fetchVacancies(1, false) }, [fetchVacancies])
 
-  useEffect(() => {
-    function handleNotifUpdate() {
-      fetchVacancies()
-    }
-    window.addEventListener('cv4you-notif-update', handleNotifUpdate)
-    return () => window.removeEventListener('cv4you-notif-update', handleNotifUpdate)
-  }, [fetchVacancies])
+
 
   async function copyLink(v: Vacancy) {
     const url = `${window.location.origin}/jobs/${v.id}`
