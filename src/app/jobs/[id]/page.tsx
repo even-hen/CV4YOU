@@ -218,10 +218,12 @@ export default function JobPage() {
 
       <div className="job-content">
         {/* Responsibilities panel */}
-        <section className="job-card mb-6">
-          <h2 className="job-section-title">About the role</h2>
-          <p className="job-responsibilities">{vacancy.responsibilities}</p>
-        </section>
+        {vacancy.responsibilities && (
+          <section className="job-card mb-6">
+            <h2 className="job-section-title">About the role</h2>
+            <p className="job-responsibilities">{vacancy.responsibilities}</p>
+          </section>
+        )}
 
         {/* Application form */}
         <form onSubmit={handleSubmit} className="job-card">

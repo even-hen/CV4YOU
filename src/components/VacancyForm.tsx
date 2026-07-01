@@ -234,12 +234,11 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
         {/* Responsibilities */}
         <div className="form-group">
-          <label className="form-label">Responsibilities *</label>
+          <label className="form-label">Responsibilities</label>
           <textarea className="form-textarea" style={{ minHeight: 150 }}
             placeholder="Describe what the candidate will be doing…"
             value={form.responsibilities}
             onChange={e => update('responsibilities', e.target.value)}
-            required
           />
         </div>
 

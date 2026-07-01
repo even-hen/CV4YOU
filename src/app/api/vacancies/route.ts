@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     salaryExpectation, knockoutQuestions, linkEnabled,
   } = parsed.data
 
-  if (!company || !role || !responsibilities || !baseRequirements) {
+  if (!company || !role || !baseRequirements) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 

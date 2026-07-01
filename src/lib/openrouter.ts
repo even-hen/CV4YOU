@@ -117,7 +117,7 @@ export interface LLMScoreResult {
 }
 
 export async function scoreCVAgainstVacancy(params: {
-  responsibilities: string
+  responsibilities?: string
   baseRequirements: string
   mandatoryRequirements: string
   niceToHave: string
@@ -174,8 +174,8 @@ Evaluate this candidate and return only the JSON object.`
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
-    temperature: 0,
-    max_tokens: 1024,
+    temperature: 0.1,
+    max_tokens: 500,
   })
 
   const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, getDefaultHeaders(), body)
@@ -216,7 +216,7 @@ Return only plain text, no markdown symbols like **, ##, etc.`
       { role: 'user', content: userPrompt },
     ],
     temperature: 0.1,
-    max_tokens: 4096,
+    max_tokens: 8000,
   })
 
   const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, getDefaultHeaders(), body)
