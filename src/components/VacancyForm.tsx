@@ -315,7 +315,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="section-title" style={{ marginBottom: 2 }}>Knockout Questions</p>
-              <p className="text-xs text-muted">Candidates failing these are automatically rejected. Shown as "Additional Questions" in the candidate form.</p>
+              <p className="text-xs text-muted">⚠️ Candidates failing these are automatically rejected. Shown as "Additional Questions" in the candidate form.</p>
             </div>
             <button type="button" className="btn btn-secondary btn-sm" onClick={addKO} style={{ flexShrink: 0 }}>
               <Plus size={14} /> Add question
