@@ -11,6 +11,20 @@ const BASE_URL = process.env.LLM_BASE_URL || 'https://openrouter.ai/api/v1'
 const MODEL = process.env.LLM_MODEL_NAME || ''
 const API_KEY = process.env.LLM_API_KEY || ''
 
+if (!API_KEY) {
+  console.warn('[openrouter] LLM_API_KEY is not set — LLM calls will fail')
+}
+
+/** Default headers for OpenRouter API requests */
+function getDefaultHeaders(): Record<string, string> {
+  return {
+    Authorization: `Bearer ${API_KEY}`,
+    'Content-Type': 'application/json',
+    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'X-Title': 'CV4YOU',
+  }
+}
+
 /** Strip markdown code fences that some models wrap JSON in */
 function extractJSON(raw: string): string {
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/)
@@ -27,7 +41,7 @@ function httpsPost(url: string, headers: Record<string, string>, body: string): 
     const parsed = new URL(url)
     const options = {
       hostname: parsed.hostname,
-      port: parsed.port || 443,
+      port: Number(parsed.port) || 443,
       path: parsed.pathname + parsed.search,
       method: 'POST',
       headers: {
@@ -80,7 +94,6 @@ async function httpsPostWithRetry(
         err.message.includes('timeout') ||
         err.code === 'ECONNRESET' ||
         err.code === 'ETIMEDOUT' ||
-        err.code === 'ENOTFOUND' ||
         err.code === 'EADDRNOTAVAIL'
 
       if (isLast || !shouldRetry) {
@@ -101,10 +114,6 @@ export interface LLMScoreResult {
   summary: string
   pros: string[]
   cons: string[]
-  breakdown: {
-    baseRequirements: number  // 0-100
-    niceToHave: number        // 0-100
-  }
 }
 
 export async function scoreCVAgainstVacancy(params: {
@@ -116,19 +125,26 @@ export async function scoreCVAgainstVacancy(params: {
   language?: string
 }): Promise<LLMScoreResult> {
   const language = params.language || 'Russian'
-  const systemPrompt = `You are an expert HR analyst. Evaluate a candidate's CV against a job vacancy.
-Return ONLY a valid JSON object with this exact shape (no markdown, no extra text) and all text values in ${language}:
+  const systemPrompt = `You are an expert IT recruitment analyst. Evaluate a candidate's CV against a job vacancy.
+
+Return ONLY a valid JSON object with this exact shape (no markdown, no extra text).
+All text values must be in ${language}.
+
 {
   "overallScore": <integer 0-100>,
   "summary": "<2-3 sentence overview>",
-  "pros": ["<strength 1>", "<strength 2>", ...],
-  "cons": ["<gap 1>", "<gap 2>", ...]
+  "pros": ["<strength>", ...],
+  "cons": ["<gap>", ...],
 }
+
 Scoring rules:
-- Mandatory requirements carry the highest weight. Missing any mandatory requirement significantly lowers the score.
-- Base requirements are important but not absolute.
-- Nice-to-have requirements are bonus points.
-- Be honest and precise. Do not inflate scores.`
+- Start from 100 and deduct points.
+- Each missing mandatory requirement: deduct 10 points.
+- Each missing base requirement: deduct 5 points.
+- Nice-to-have matches add +2 to +5 bonus points each (cap total at 100).
+- If a mandatory requirement is completely absent, cap overallScore at 60.
+- Provide 3-5 strengths in "pros" and 3-5 gaps in "cons".
+- Be precise and honest. Do not inflate or deflate scores.`
 
   const responsibilitiesBlock = params.responsibilities
     ? `**Responsibilities:**\n${params.responsibilities}\n\n`
@@ -136,7 +152,9 @@ Scoring rules:
 
   const userPrompt = `## Job Vacancy
 
-${responsibilitiesBlock}**Base Requirements:**
+${responsibilitiesBlock}
+
+**Base Requirements:**
 ${params.baseRequirements}
 
 **Mandatory Requirements:**
@@ -146,7 +164,6 @@ ${params.mandatoryRequirements}
 ${params.niceToHave}
 
 ## Candidate CV Text
-
 ${params.cvText}
 
 Evaluate this candidate and return only the JSON object.`
@@ -157,28 +174,37 @@ Evaluate this candidate and return only the JSON object.`
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
-    temperature: 0.2,
-    max_tokens: 2048,
+    temperature: 0,
+    max_tokens: 1024,
   })
 
-  const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, {
-    Authorization: `Bearer ${API_KEY}`,
-    'Content-Type': 'application/json',
-    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'X-Title': 'CV4YOU',
-  }, body)
+  const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, getDefaultHeaders(), body)
 
   const data = JSON.parse(text)
   const content = data.choices?.[0]?.message?.content
   if (!content) throw new Error('Empty response from LLM')
 
-  return JSON.parse(extractJSON(content)) as LLMScoreResult
+  const result = JSON.parse(extractJSON(content))
+  if (
+    typeof result.overallScore !== 'number' ||
+    typeof result.summary !== 'string' ||
+    !Array.isArray(result.pros) ||
+    !Array.isArray(result.cons)
+  ) {
+    throw new Error(`LLM returned unexpected JSON shape: ${JSON.stringify(result).slice(0, 200)}`)
+  }
+  return result as LLMScoreResult
 }
 
 export async function generateStructuredCV(extractedText: string): Promise<string> {
-  const systemPrompt = `You are a professional resume writer. Transform raw CV text into a clean, structured professional resume in plain text format. 
+  if (!extractedText?.trim()) {
+    throw new Error('No CV text to restructure')
+  }
+
+  const systemPrompt = `You are a professional resume writer. Transform raw CV text into a clean, structured professional resume in plain text format.
 Use clear section headers (CONTACT INFORMATION, PROFESSIONAL SUMMARY, WORK EXPERIENCE, EDUCATION, SKILLS, etc.).
 Keep all factual information from the original text. Do not add anything that isn't in the original.
+Preserve the original language of the CV.
 Return only plain text, no markdown symbols like **, ##, etc.`
 
   const userPrompt = `Here is the raw extracted text from a candidate's CV. Please restructure it into a clean, professional resume:\n\n${extractedText}`
@@ -189,17 +215,14 @@ Return only plain text, no markdown symbols like **, ##, etc.`
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ],
-    temperature: 0.3,
+    temperature: 0.1,
     max_tokens: 4096,
   })
 
-  const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, {
-    Authorization: `Bearer ${API_KEY}`,
-    'Content-Type': 'application/json',
-    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    'X-Title': 'CV4YOU',
-  }, body)
+  const text = await httpsPostWithRetry(`${BASE_URL}/chat/completions`, getDefaultHeaders(), body)
 
   const data = JSON.parse(text)
-  return data.choices?.[0]?.message?.content || ''
+  const content = data.choices?.[0]?.message?.content
+  if (!content) throw new Error('Empty response from LLM')
+  return content
 }

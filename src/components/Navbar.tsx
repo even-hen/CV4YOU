@@ -60,7 +60,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
   // Fetch initial notifications when bell is opened
   useEffect(() => {
     if (!bellOpen) return
-    
+
     async function fetchInitialNotifications() {
       setLoading(true)
       try {
@@ -170,12 +170,12 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
                       </a>
                     ))}
                     {hasMore && (
-                      <button 
-                        className="notif-load-more" 
-                        onClick={loadMore} 
+                      <button
+                        className="notif-load-more"
+                        onClick={loadMore}
                         disabled={loadingMore}
                       >
-                        {loadingMore ? 'Loading...' : 'Show 5 more'}
+                        {loadingMore ? 'Loading...' : 'Show more...'}
                       </button>
                     )}
                   </>
