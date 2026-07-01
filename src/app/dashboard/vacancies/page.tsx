@@ -169,103 +169,107 @@ export default function VacanciesPage() {
         </div>
       )}
 
-      {/* Control Bar: Tabs -> Sort -> Search */}
-      <div className="control-bar">
-        <div className="tabs">
-          <button className={`tab${tab === 'active' ? ' active' : ''}`} onClick={() => setTab('active')}>
-            Active
-          </button>
-          <button className={`tab${tab === 'archived' ? ' active' : ''}`} onClick={() => setTab('archived')}>
-            Archived
-          </button>
+      {/* White Dashboard Container */}
+      <div className="dashboard-container">
+        {/* Control Bar: Tabs -> Sort -> Search */}
+        <div className="control-bar">
+          <div className="tabs">
+            <button className={`tab${tab === 'active' ? ' active' : ''}`} onClick={() => setTab('active')}>
+              Active
+            </button>
+            <button className={`tab${tab === 'archived' ? ' active' : ''}`} onClick={() => setTab('archived')}>
+              Archived
+            </button>
+          </div>
+
+          {/* Sort dropdown */}
+          <div ref={sortRef} style={{ position: 'relative' }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => setSortOpen(v => !v)}
+              style={{ gap: 6, paddingTop: 12, paddingBottom: 12 }}
+            >
+              <ArrowUpDown size={14} /> {SORT_LABELS[sort]} <ChevronDown size={13} />
+            </button>
+            {sortOpen && (
+              <div className="user-menu-dropdown" style={{ minWidth: 210, right: 0, left: 'auto', top: 'calc(100% + 6px)' }}>
+                {(Object.keys(SORT_LABELS) as SortKey[]).map(k => (
+                  <button key={k} className="user-menu-item" onClick={() => { setSort(k); setSortOpen(false) }}>
+                    {sort === k && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
+                    {sort !== k && <span style={{ width: 14 }} />}
+                    {SORT_LABELS[k]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Search */}
+          <div className="search-wrapper" style={{ flex: 1, minWidth: 160, maxWidth: 320 }}>
+            <Search size={15} className="search-icon" />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Search role or company…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ paddingLeft: 36, background: 'var(--color-surface)' }}
+            />
+            {search && (
+              <button className="search-clear" onClick={() => setSearch('')}><X size={14} /></button>
+            )}
+          </div>
         </div>
 
-        {/* Sort dropdown */}
-        <div ref={sortRef} style={{ position: 'relative' }}>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => setSortOpen(v => !v)}
-            style={{ gap: 6, paddingTop: 12, paddingBottom: 12 }}
-          >
-            <ArrowUpDown size={14} /> {SORT_LABELS[sort]} <ChevronDown size={13} />
-          </button>
-          {sortOpen && (
-            <div className="user-menu-dropdown" style={{ minWidth: 210, right: 0, left: 'auto', top: 'calc(100% + 6px)' }}>
-              {(Object.keys(SORT_LABELS) as SortKey[]).map(k => (
-                <button key={k} className="user-menu-item" onClick={() => { setSort(k); setSortOpen(false) }}>
-                  {sort === k && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
-                  {sort !== k && <span style={{ width: 14 }} />}
-                  {SORT_LABELS[k]}
+        {/* Vacancy list */}
+        {loading ? (
+          <div className="empty-state"><div className="spinner" /></div>
+        ) : vacancies.length === 0 ? (
+          <div className="empty-state">
+            <Briefcase size={40} className="empty-state-icon" />
+            <h3>{tab === 'active' ? 'No active vacancies' : 'No archived vacancies'}</h3>
+            <p>{tab === 'active' ? 'Create your first vacancy to start receiving applications.' : 'Archived vacancies will appear here.'}</p>
+            {tab === 'active' && (
+              <button className="btn btn-primary mt-4" onClick={() => router.push('/dashboard/vacancies/new')}>
+                <Plus size={15} /> Create Vacancy
+              </button>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {vacancies.map(v => (
+              <VacancyCard
+                key={v.id}
+                vacancy={v}
+                copiedId={copiedId}
+                onEdit={() => router.push(`/dashboard/vacancies/${v.id}/edit`)}
+                onViewApps={() => router.push(`/dashboard/vacancies/${v.id}/candidates`)}
+                onCopyLink={() => copyLink(v)}
+              />
+            ))}
+            {tab === 'archived' && hasMoreArchived && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={loadMoreArchived}
+                  disabled={loadingMoreArchived}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                >
+                  {loadingMoreArchived ? (
+                    <>
+                      <span className="spinner" style={{ width: 14, height: 14 }} /> Loading…
+                    </>
+                  ) : (
+                    'Load More'
+                  )}
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Search */}
-        <div className="search-wrapper" style={{ flex: 1, minWidth: 160, maxWidth: 320 }}>
-          <Search size={15} className="search-icon" />
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Search role or company…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ paddingLeft: 36, background: 'var(--color-surface)' }}
-          />
-          {search && (
-            <button className="search-clear" onClick={() => setSearch('')}><X size={14} /></button>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Vacancy list */}
-      {loading ? (
-        <div className="empty-state"><div className="spinner" /></div>
-      ) : vacancies.length === 0 ? (
-        <div className="empty-state">
-          <Briefcase size={40} className="empty-state-icon" />
-          <h3>{tab === 'active' ? 'No active vacancies' : 'No archived vacancies'}</h3>
-          <p>{tab === 'active' ? 'Create your first vacancy to start receiving applications.' : 'Archived vacancies will appear here.'}</p>
-          {tab === 'active' && (
-            <button className="btn btn-primary mt-4" onClick={() => router.push('/dashboard/vacancies/new')}>
-              <Plus size={15} /> Create Vacancy
-            </button>
-          )}
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {vacancies.map(v => (
-            <VacancyCard
-              key={v.id}
-              vacancy={v}
-              copiedId={copiedId}
-              onEdit={() => router.push(`/dashboard/vacancies/${v.id}/edit`)}
-              onViewApps={() => router.push(`/dashboard/vacancies/${v.id}/candidates`)}
-              onCopyLink={() => copyLink(v)}
-            />
-          ))}
-          {tab === 'archived' && hasMoreArchived && (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={loadMoreArchived}
-                disabled={loadingMoreArchived}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-              >
-                {loadingMoreArchived ? (
-                  <>
-                    <span className="spinner" style={{ width: 14, height: 14 }} /> Loading…
-                  </>
-                ) : (
-                  'Load More'
-                )}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Archive confirm modal */}
       {confirmArchive && (

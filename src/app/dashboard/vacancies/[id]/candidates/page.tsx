@@ -269,9 +269,9 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="candidates-page" style={{ maxWidth: 800, margin: '0 auto', width: '100%' }}>
+    <div className="candidates-page" style={{ maxWidth: 800, margin: '0 auto', width: '100%', padding: '0 16px' }}>
       {/* Header */}
-      <div className="candidates-header">
+      <div className="candidates-header" style={{ marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0px 10px', alignItems: 'center' }}>
           <div style={{ gridRow: '1 / 2', gridColumn: '1 / 2' }}>
             <Link href="/dashboard/vacancies" className="btn btn-ghost btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -289,9 +289,12 @@ export default function CandidatesPage() {
             </>
           )}
         </div>
+      </div>
 
+      {/* White Dashboard Container */}
+      <div className="dashboard-container">
         {/* Controls: New|All -> Threshold -> Sorting -> Search */}
-        <div className="candidates-controls">
+        <div className="candidates-controls" style={{ marginBottom: 20 }}>
           {/* Tabs */}
           <div className="cand-tabs">
             <button
@@ -385,14 +388,14 @@ export default function CandidatesPage() {
             />
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="candidates-content">
-        {loading ? (
-          <div className="candidates-loading">
-            <Loader2 size={28} className="spin" />
-            <span>Loading candidates…</span>
+        {/* Content */}
+        <div className="candidates-content" style={{ padding: 0, maxWidth: 'none', margin: 0 }}>
+          {loading ? (
+            <div className="candidates-loading">
+              <Loader2 size={28} className="spin" />
+              <span>Loading candidates…</span>
+
           </div>
         ) : candidates.length === 0 ? (
           <div className="candidates-empty">
@@ -599,6 +602,8 @@ export default function CandidatesPage() {
           </div>
         )}
       </div>
+      </div>
+
 
       {/* Floating Action Button (FAB) for Refresh */}
       <button
