@@ -169,6 +169,8 @@ export default function VacanciesPage() {
         </div>
       )}
 
+      <h1 style={{ fontSize: '1.375rem', fontWeight: 800, marginBottom: 16 }}>Vacancies</h1>
+
       {/* White Dashboard Container */}
       <div className="dashboard-container">
         {/* Control Bar: Tabs -> Sort -> Search */}

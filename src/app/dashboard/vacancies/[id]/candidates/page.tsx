@@ -269,7 +269,7 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="candidates-page" style={{ maxWidth: 800, margin: '0 auto', width: '100%', padding: '0 16px' }}>
+    <div className="candidates-page" style={{ maxWidth: 960, margin: '0 auto', width: '100%', padding: '0 16px' }}>
       {/* Header */}
       <div className="candidates-header" style={{ marginBottom: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0px 10px', alignItems: 'center' }}>
@@ -396,212 +396,212 @@ export default function CandidatesPage() {
               <Loader2 size={28} className="spin" />
               <span>Loading candidates…</span>
 
-          </div>
-        ) : candidates.length === 0 ? (
-          <div className="candidates-empty">
-            <div className="candidates-empty-icon">📭</div>
-            <h3>No candidates yet</h3>
-            <p>
-              {tab === 'new'
-                ? 'No new applications. Switch to "All" to see reviewed candidates.'
-                : 'No applications match your current filters.'}
-            </p>
-          </div>
-        ) : (
-          <div className="candidates-list">
-            {candidates.map(c => (
-              <div
-                key={c.id}
-                className={`candidate-card${!c.seen ? ' unseen' : ''}${expanded === c.id ? ' expanded' : ''}`}
-              >
-                {/* Card header — always visible */}
-                <div className="candidate-card-header" onClick={e => handleExpand(c, e)}>
-                  <div className="candidate-card-left">
-                    <div className="candidate-avatar">
-                      {c.candidateName.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="candidate-info">
-                      <div className="candidate-name">{c.candidateName}</div>
-                      <div className="candidate-meta">
-                        {Object.entries(c.contacts).map(([k, v]) => v ? (
-                          <span key={k}>
-                            {k === 'email' ? <Mail size={11} /> : k === 'phone' ? <Phone size={11} /> : <span style={{ fontSize: '0.7rem' }}>✈️</span>}
-                            {v}
-                          </span>
-                        ) : null)}
-                        {c.salaryExpectation && (
-                          <span>💰 {c.salaryExpectation}</span>
-                        )}
+            </div>
+          ) : candidates.length === 0 ? (
+            <div className="candidates-empty">
+              <div className="candidates-empty-icon">📭</div>
+              <h3>No candidates yet</h3>
+              <p>
+                {tab === 'new'
+                  ? 'No new applications. Switch to "All" to see reviewed candidates.'
+                  : 'No applications match your current filters.'}
+              </p>
+            </div>
+          ) : (
+            <div className="candidates-list">
+              {candidates.map(c => (
+                <div
+                  key={c.id}
+                  className={`candidate-card${!c.seen ? ' unseen' : ''}${expanded === c.id ? ' expanded' : ''}`}
+                >
+                  {/* Card header — always visible */}
+                  <div className="candidate-card-header" onClick={e => handleExpand(c, e)}>
+                    <div className="candidate-card-left">
+                      <div className="candidate-avatar">
+                        {c.candidateName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="candidate-info">
+                        <div className="candidate-name">{c.candidateName}</div>
+                        <div className="candidate-meta">
+                          {Object.entries(c.contacts).map(([k, v]) => v ? (
+                            <span key={k}>
+                              {k === 'email' ? <Mail size={11} /> : k === 'phone' ? <Phone size={11} /> : <span style={{ fontSize: '0.7rem' }}>✈️</span>}
+                              {v}
+                            </span>
+                          ) : null)}
+                          {c.salaryExpectation && (
+                            <span>💰 {c.salaryExpectation}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    <div className="candidate-card-right">
+                      <ScoreBadge score={c.overallScore} status={c.status} />
+                      <ChevronRight
+                        size={16}
+                        className={`expand-chevron${expanded === c.id ? ' open' : ''}`}
+                      />
+                    </div>
                   </div>
-                  <div className="candidate-card-right">
-                    <ScoreBadge score={c.overallScore} status={c.status} />
-                    <ChevronRight
-                      size={16}
-                      className={`expand-chevron${expanded === c.id ? ' open' : ''}`}
-                    />
-                  </div>
-                </div>
 
-                {/* Expanded detail */}
-                {expanded === c.id && (
-                  <div className="candidate-detail">
+                  {/* Expanded detail */}
+                  {expanded === c.id && (
+                    <div className="candidate-detail">
 
-                    {/* Failed AI Scoring Alert Banner */}
-                    {c.status === 'FAILED_SCORING' && (
-                      <div style={{
-                        background: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
-                          <AlertTriangle size={16} />
-                          AI Resume Evaluation Failed
+                      {/* Failed AI Scoring Alert Banner */}
+                      {c.status === 'FAILED_SCORING' && (
+                        <div style={{
+                          background: 'rgba(239, 68, 68, 0.08)',
+                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                          borderRadius: '8px',
+                          padding: '12px 16px',
+                          marginBottom: '16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
+                            <AlertTriangle size={16} />
+                            AI Resume Evaluation Failed
+                          </div>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
+                            The system failed to evaluate this resume with the AI model. You can review the candidate's contacts or manually trigger a retry.
+                          </p>
+                          <div>
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-sm"
+                              style={{ padding: '4px 12px', fontSize: '0.8rem', height: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                              onClick={() => retryScoring(c.id)}
+                              disabled={retrying === c.id}
+                            >
+                              {retrying === c.id ? (
+                                <Loader2 size={12} className="spin" />
+                              ) : (
+                                <RefreshCw size={12} />
+                              )}
+                              Retry AI Scoring
+                            </button>
+                          </div>
                         </div>
-                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
-                          The system failed to evaluate this resume with the AI model. You can review the candidate's contacts or manually trigger a retry.
-                        </p>
-                        <div>
+                      )}
+
+                      {/* Summary */}
+                      {c.summary && (
+                        <div className="candidate-summary">
+                          <p>{c.summary}</p>
+                        </div>
+                      )}
+
+                      {/* Actions bar — moved below summary */}
+                      <div className="candidate-actions" style={{ justifyContent: 'flex-end' }}>
+                        {c.status === 'FAILED_SCORING' && (
                           <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            style={{ padding: '4px 12px', fontSize: '0.8rem', height: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                            className="cand-action-btn active-blue"
                             onClick={() => retryScoring(c.id)}
                             disabled={retrying === c.id}
+                            title="Retry AI Scoring"
+                            style={{ gap: 6 }}
                           >
                             {retrying === c.id ? (
-                              <Loader2 size={12} className="spin" />
+                              <><Loader2 size={14} className="spin" /> Retrying…</>
                             ) : (
-                              <RefreshCw size={12} />
+                              <><RefreshCw size={14} /> Retry</>
                             )}
-                            Retry AI Scoring
                           </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Summary */}
-                    {c.summary && (
-                      <div className="candidate-summary">
-                        <p>{c.summary}</p>
-                      </div>
-                    )}
-
-                    {/* Actions bar — moved below summary */}
-                    <div className="candidate-actions" style={{ justifyContent: 'flex-end' }}>
-                      {c.status === 'FAILED_SCORING' && (
+                        )}
                         <button
-                          className="cand-action-btn active-blue"
-                          onClick={() => retryScoring(c.id)}
-                          disabled={retrying === c.id}
-                          title="Retry AI Scoring"
-                          style={{ gap: 6 }}
+                          className="cand-action-btn danger"
+                          onClick={() => deleteCandidate(c.id)}
+                          disabled={deleting === c.id}
+                          title="Delete application"
                         >
-                          {retrying === c.id ? (
-                            <><Loader2 size={14} className="spin" /> Retrying…</>
+                          {deleting === c.id ? (
+                            <Loader2 size={14} className="spin" />
                           ) : (
-                            <><RefreshCw size={14} /> Retry</>
+                            <><Trash2 size={14} /> Delete</>
                           )}
                         </button>
-                      )}
-                      <button
-                        className="cand-action-btn danger"
-                        onClick={() => deleteCandidate(c.id)}
-                        disabled={deleting === c.id}
-                        title="Delete application"
-                      >
-                        {deleting === c.id ? (
-                          <Loader2 size={14} className="spin" />
-                        ) : (
-                          <><Trash2 size={14} /> Delete</>
-                        )}
-                      </button>
-                      <button
-                        className="cand-action-btn"
-                        onClick={() => downloadCV(c)}
-                        disabled={downloading === c.id}
-                        title="Download structured CV"
-                      >
-                        {downloading === c.id ? (
-                          <><Loader2 size={14} className="spin" /> Generating…</>
-                        ) : (
-                          <><Download size={14} /> Download</>
-                        )}
-                      </button>
-                      <button
-                        className={`cand-action-btn${!c.seen ? ' active-blue' : ''}`}
-                        onClick={() => toggleSeen(c)}
-                        disabled={seenToggling === c.id}
-                        title={c.seen ? 'Unread' : 'Read'}
-                      >
-                        {seenToggling === c.id ? (
-                          <Loader2 size={14} className="spin" />
-                        ) : c.seen ? (
-                          <><EyeOff size={14} /> Unread</>
-                        ) : (
-                          <><Eye size={14} /> Read</>
-                        )}
-                      </button>
-                    </div>
+                        <button
+                          className="cand-action-btn"
+                          onClick={() => downloadCV(c)}
+                          disabled={downloading === c.id}
+                          title="Download structured CV"
+                        >
+                          {downloading === c.id ? (
+                            <><Loader2 size={14} className="spin" /> Generating…</>
+                          ) : (
+                            <><Download size={14} /> Download</>
+                          )}
+                        </button>
+                        <button
+                          className={`cand-action-btn${!c.seen ? ' active-blue' : ''}`}
+                          onClick={() => toggleSeen(c)}
+                          disabled={seenToggling === c.id}
+                          title={c.seen ? 'Unread' : 'Read'}
+                        >
+                          {seenToggling === c.id ? (
+                            <Loader2 size={14} className="spin" />
+                          ) : c.seen ? (
+                            <><EyeOff size={14} /> Unread</>
+                          ) : (
+                            <><Eye size={14} /> Read</>
+                          )}
+                        </button>
+                      </div>
 
-                    {/* Pros & Cons */}
-                    <div className="candidate-proscons">
-                      {c.pros.length > 0 && (
-                        <div className="proscons-col">
-                          <h4 className="detail-section-title pros">
-                            <CheckCircle2 size={14} /> Strengths
-                          </h4>
-                          <ul className="proscons-list pros">
-                            {c.pros.map((p, i) => <li key={i}>{p}</li>)}
-                          </ul>
-                        </div>
-                      )}
-                      {c.cons.length > 0 && (
-                        <div className="proscons-col">
-                          <h4 className="detail-section-title cons">
-                            <XCircle size={14} /> Gaps
-                          </h4>
-                          <ul className="proscons-list cons">
-                            {c.cons.map((g, i) => <li key={i}>{g}</li>)}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                      {/* Pros & Cons */}
+                      <div className="candidate-proscons">
+                        {c.pros.length > 0 && (
+                          <div className="proscons-col">
+                            <h4 className="detail-section-title pros">
+                              <CheckCircle2 size={14} /> Strengths
+                            </h4>
+                            <ul className="proscons-list pros">
+                              {c.pros.map((p, i) => <li key={i}>{p}</li>)}
+                            </ul>
+                          </div>
+                        )}
+                        {c.cons.length > 0 && (
+                          <div className="proscons-col">
+                            <h4 className="detail-section-title cons">
+                              <XCircle size={14} /> Gaps
+                            </h4>
+                            <ul className="proscons-list cons">
+                              {c.cons.map((g, i) => <li key={i}>{g}</li>)}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
 
-                    {/* Undercut timestamp footer */}
-                    <div style={{ borderTop: '1px solid var(--color-border-subtle)', fontSize: '0.75rem', color: 'var(--color-text-subtle)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Calendar size={13} /> Submitted on {new Date(c.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {/* Undercut timestamp footer */}
+                      <div style={{ borderTop: '1px solid var(--color-border-subtle)', fontSize: '0.75rem', color: 'var(--color-text-subtle)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Calendar size={13} /> Submitted on {new Date(c.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-            {hasMore && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', marginBottom: '24px' }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-                >
-                  {loadingMore ? (
-                    <><Loader2 size={16} className="spin" /> Loading…</>
-                  ) : (
-                    'Load More'
                   )}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                </div>
+              ))}
+              {hasMore && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', marginBottom: '24px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                  >
+                    {loadingMore ? (
+                      <><Loader2 size={16} className="spin" /> Loading…</>
+                    ) : (
+                      'Load More'
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
 
