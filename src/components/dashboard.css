@@ -424,7 +424,7 @@
 }
 
 .dashboard-container {
-  background: #eeeeee;
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 15px;
