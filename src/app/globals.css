@@ -9,7 +9,7 @@
 :root,
 [data-theme="light"] {
   --color-bg: #ffffff;
-  --color-surface: #E8EAF6;
+  --color-surface: #ffffff;
   --color-surface-2: #f5f7fc;
   --color-surface-3: #eaecf5;
   --color-border: #d4d9ec;
@@ -636,7 +636,7 @@ select {
   gap: 8px;
   padding: 6px 12px;
   border-radius: var(--radius-md);
-  background: var(--color-surface-2);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   font-size: 0.875rem;
@@ -1402,7 +1402,7 @@ select {
 
 /* ── Vacancy Card ────────────────────────────────────────────── */
 .vacancy-card {
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 16px 20px;
