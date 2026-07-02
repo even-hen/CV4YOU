@@ -547,7 +547,7 @@ input[type=range]:active::-webkit-slider-thumb {
 
 /* Vacancy editor form */
 .vacancy-form {
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 28px 24px;
