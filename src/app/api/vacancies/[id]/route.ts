@@ -43,8 +43,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
   const data = parsed.data
 
+  const isActiveUpdate = 'isActive' in body ? data.isActive : undefined
+  const linkEnabledUpdate = 'linkEnabled' in body ? data.linkEnabled : undefined
+
   // If activating, check quota
-  if (data.isActive === true && !existing.isActive) {
+  if (isActiveUpdate === true && !existing.isActive) {
     const user = await prisma.user.findUnique({ where: { id: recruiterId } })
     const activeCount = await prisma.vacancy.count({ where: { recruiterId, isActive: true } })
     const limit = PLAN_LIMITS[user!.subscriptionTier]
@@ -55,6 +58,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       )
     }
   }
+
+  // Requirement 1: When archiving, disable candidate link
+  const finalLinkEnabled = isActiveUpdate === false ? false : linkEnabledUpdate
 
   const updated = await prisma.vacancy.update({
     where: { id },
@@ -68,8 +74,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(data.requestedContacts !== undefined && { requestedContacts: JSON.stringify(data.requestedContacts) }),
       ...(data.salaryExpectation !== undefined && { salaryExpectation: data.salaryExpectation }),
       ...(data.knockoutQuestions !== undefined && { knockoutQuestions: JSON.stringify(data.knockoutQuestions) }),
-      ...(data.linkEnabled !== undefined && { linkEnabled: data.linkEnabled }),
-      ...(data.isActive !== undefined && { isActive: data.isActive }),
+      ...(finalLinkEnabled !== undefined && { linkEnabled: finalLinkEnabled }),
+      ...(isActiveUpdate !== undefined && { isActive: isActiveUpdate }),
     },
   })
 
@@ -85,6 +91,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   const existing = await getVacancyOwned(id, session.user.id as string)
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  await prisma.vacancy.update({ where: { id }, data: { isActive: false } })
+  await prisma.vacancy.update({ where: { id }, data: { isActive: false, linkEnabled: false } })
   return NextResponse.json({ success: true })
 }

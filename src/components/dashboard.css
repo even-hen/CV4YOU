@@ -434,7 +434,7 @@
 
 @media (max-width: 640px) {
   .dashboard-container {
-    padding: 15px;
+    padding: 10px;
     border-radius: var(--radius-lg);
   }
 }

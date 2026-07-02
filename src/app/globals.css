@@ -8,8 +8,8 @@
 /* ── Design Tokens — Light (default) ────────────────────────── */
 :root,
 [data-theme="light"] {
-  --color-bg: #E8EAF6;
-  --color-surface: #ffffff;
+  --color-bg: #ffffff;
+  --color-surface: #E8EAF6;
   --color-surface-2: #f5f7fc;
   --color-surface-3: #eaecf5;
   --color-border: #d4d9ec;
@@ -174,7 +174,7 @@ select {
 /* ── Navbar ────────────────────────────────────────────────── */
 .navbar {
   height: var(--nav-height);
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;

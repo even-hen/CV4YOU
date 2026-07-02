@@ -24,6 +24,7 @@ export interface VacancyFormData {
   salaryExpectation: string
   knockoutQuestions: KOQuestion[]
   linkEnabled: boolean
+  isActive?: boolean
 }
 
 const EMPTY_FORM: VacancyFormData = {
@@ -37,6 +38,7 @@ const EMPTY_FORM: VacancyFormData = {
   salaryExpectation: '',
   knockoutQuestions: [],
   linkEnabled: true,
+  isActive: true,
 }
 
 const CONTACT_OPTIONS = [
@@ -387,9 +389,9 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
             <p className="section-title" style={{ marginBottom: 2 }}>Candidate Application Link</p>
             <p className="text-xs text-muted">When disabled, candidates cannot submit applications via the public link.</p>
           </div>
-          <label className="toggle-wrapper" style={{ flexShrink: 0 }}>
-            <label className="toggle">
-              <input type="checkbox" checked={form.linkEnabled} onChange={e => update('linkEnabled', e.target.checked)} />
+          <label className="toggle-wrapper" style={{ flexShrink: 0, opacity: form.isActive === false ? 0.5 : 1, cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
+            <label className="toggle" style={{ cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
+              <input type="checkbox" checked={form.linkEnabled} disabled={form.isActive === false} onChange={e => update('linkEnabled', e.target.checked)} />
               <span className="toggle-track" />
               <span className="toggle-thumb" />
             </label>
@@ -403,39 +405,39 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
         {mode === 'edit' && linkUrl && (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <a
-              href={form.linkEnabled ? linkUrl : undefined}
+              href={form.linkEnabled && form.isActive !== false ? linkUrl : undefined}
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: form.linkEnabled ? 'var(--color-text-muted)' : 'var(--color-text-subtle)',
-                textDecoration: form.linkEnabled ? 'underline' : 'none',
+                color: form.linkEnabled && form.isActive !== false ? 'var(--color-text-muted)' : 'var(--color-text-subtle)',
+                textDecoration: form.linkEnabled && form.isActive !== false ? 'underline' : 'none',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 fontWeight: 500,
                 fontSize: '0.875rem',
-                cursor: form.linkEnabled ? 'pointer' : 'default'
+                cursor: form.linkEnabled && form.isActive !== false ? 'pointer' : 'default'
               }}
-              title={form.linkEnabled ? 'Click to open candidate application page' : 'Link is currently disabled'}
-              onClick={(e) => { if (!form.linkEnabled) e.preventDefault(); }}
+              title={form.linkEnabled && form.isActive !== false ? 'Click to open candidate application page' : 'Link is currently disabled'}
+              onClick={(e) => { if (!form.linkEnabled || form.isActive === false) e.preventDefault(); }}
             >
               {linkUrl}
             </a>
             <button
               type="button"
               onClick={copyLink}
-              disabled={!form.linkEnabled}
+              disabled={!form.linkEnabled || form.isActive === false}
               style={{
                 background: 'none',
                 border: 'none',
                 padding: '4px 6px',
-                cursor: form.linkEnabled ? 'pointer' : 'not-allowed',
-                color: copiedLink ? 'var(--color-success)' : (form.linkEnabled ? 'var(--color-primary)' : 'var(--color-text-subtle)'),
+                cursor: form.linkEnabled && form.isActive !== false ? 'pointer' : 'not-allowed',
+                color: copiedLink ? 'var(--color-success)' : (form.linkEnabled && form.isActive !== false ? 'var(--color-primary)' : 'var(--color-text-subtle)'),
                 display: 'inline-flex',
                 alignItems: 'center',
                 borderRadius: 'var(--radius-sm)',
                 transition: 'all var(--transition)',
-                opacity: form.linkEnabled ? 1 : 0.5,
+                opacity: form.linkEnabled && form.isActive !== false ? 1 : 0.5,
                 flexShrink: 0
               }}
               title="Copy candidate link"
@@ -453,10 +455,20 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <button
             type="button"
             className="btn btn-secondary"
-            style={mode === 'create' ? { opacity: 0.4, cursor: 'not-allowed' } : { color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
-            disabled={mode === 'create' || archiving || saving}
+            style={
+              mode === 'create' || form.isActive === false
+                ? { opacity: 0.4, cursor: 'not-allowed' }
+                : { color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }
+            }
+            disabled={mode === 'create' || archiving || saving || form.isActive === false}
             onClick={() => setConfirmArchive(true)}
-            title={mode === 'create' ? 'Cannot archive new vacancy' : 'Archive vacancy'}
+            title={
+              mode === 'create'
+                ? 'Cannot archive new vacancy'
+                : form.isActive === false
+                ? 'Vacancy is already archived'
+                : 'Archive vacancy'
+            }
           >
             {archiving ? <><Loader2 size={15} className="spin" /> Archiving…</> : <><Archive size={15} /> Archive</>}
           </button>

@@ -32,6 +32,7 @@ export default function EditVacancyPage() {
         salaryExpectation: v.salaryExpectation || '',
         knockoutQuestions: v.knockoutQuestions || [],
         linkEnabled: v.linkEnabled,
+        isActive: v.isActive,
       })
       setLoading(false)
     }
