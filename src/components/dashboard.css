@@ -416,7 +416,7 @@
 
 /* Settings page */
 .settings-section {
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 24px;
