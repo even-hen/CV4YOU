@@ -1340,7 +1340,7 @@ select {
   resize: vertical;
   font-family: inherit;
   font-size: 0.9375rem;
-  background: var(--color-surface-2);
+  background: var(--color-surface);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text);
