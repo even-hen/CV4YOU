@@ -288,7 +288,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <label className="form-label">Salary Expectation</label>
           <div style={{ display: 'flex', gap: 10 }}>
             {SALARY_OPTIONS.map(o => (
-              <label key={o.value} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', background: form.salaryExpectation === o.value ? 'var(--color-primary-dim)' : 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.salaryExpectation === o.value ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)', fontSize: '0.875rem' }}>
+              <label key={o.value} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', background: form.salaryExpectation === o.value ? 'var(--color-primary-dim)' : 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.salaryExpectation === o.value ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)', fontSize: '0.875rem' }}>
                 <input type="radio" name="salary" value={o.value} checked={form.salaryExpectation === o.value} onChange={() => update('salaryExpectation', o.value)} style={{ accentColor: 'var(--color-primary)' }} />
                 {o.label}
               </label>
@@ -301,7 +301,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <p className="section-title">Request Contact Information</p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             {CONTACT_OPTIONS.map(c => (
-              <label key={c.key} className="checkbox-group" style={{ padding: '8px 14px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.requestedContacts.includes(c.key) ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)' }}>
+              <label key={c.key} className="checkbox-group" style={{ padding: '8px 14px', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.requestedContacts.includes(c.key) ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)' }}>
                 <input type="checkbox" checked={form.requestedContacts.includes(c.key)} onChange={() => toggleContact(c.key)} />
                 {c.label}
               </label>
@@ -466,8 +466,8 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
               mode === 'create'
                 ? 'Cannot archive new vacancy'
                 : form.isActive === false
-                ? 'Vacancy is already archived'
-                : 'Archive vacancy'
+                  ? 'Vacancy is already archived'
+                  : 'Archive vacancy'
             }
           >
             {archiving ? <><Loader2 size={15} className="spin" /> Archiving…</> : <><Archive size={15} /> Archive</>}

@@ -123,7 +123,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
   return (
     <nav className="navbar">
-      <Link href="/dashboard/vacancies" className="navbar-logo">CV4YOU</Link>
+      <Link href="/dashboard/vacancies" className="navbar-logo">🎯 CV4YOU</Link>
 
       {title && <span className="navbar-title">{title}</span>}
 
