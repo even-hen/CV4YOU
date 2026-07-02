@@ -2753,3 +2753,19 @@ select {
   animation: spin 0.7s linear infinite;
   display: inline-block;
 }
+
+/* ── Skeleton loader utility ──────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.skeleton {
+  background-color: var(--color-border);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  display: inline-block;
+}

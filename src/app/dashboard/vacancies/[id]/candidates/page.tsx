@@ -278,13 +278,22 @@ export default function CandidatesPage() {
               <ArrowLeft size={16} /> Back
             </Link>
           </div>
-          {vacancy && (
+          {vacancy ? (
             <>
               <div style={{ gridRow: '1 / 2', gridColumn: '2 / 3' }}>
                 <h1 className="candidates-role" style={{ margin: 0, lineHeight: 1.2 }}>{vacancy.role}</h1>
               </div>
               <div style={{ gridRow: '2 / 3', gridColumn: '2 / 3' }}>
                 <span className="candidates-company">{vacancy.company}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ gridRow: '1 / 2', gridColumn: '2 / 3', display: 'flex', alignItems: 'center' }}>
+                <div className="skeleton" style={{ width: '220px', height: '22px', borderRadius: '6px', margin: '2px 0' }} />
+              </div>
+              <div style={{ gridRow: '2 / 3', gridColumn: '2 / 3', display: 'flex', alignItems: 'center' }}>
+                <div className="skeleton" style={{ width: '130px', height: '13px', borderRadius: '4px', margin: '4px 0' }} />
               </div>
             </>
           )}
