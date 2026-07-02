@@ -298,7 +298,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
         {/* Contact fields */}
         <div>
-          <p className="section-title">Request Contact Information</p>
+          <p className="form-label" style={{ marginBottom: 10 }}>Request Contact Information</p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             {CONTACT_OPTIONS.map(c => (
               <label key={c.key} className="checkbox-group" style={{ padding: '8px 14px', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.requestedContacts.includes(c.key) ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)' }}>
