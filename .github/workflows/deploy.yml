@@ -78,4 +78,4 @@ jobs:
             rm -rf node_modules .next
             
             # Restart or start the PM2 process from the standalone build
-            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start standalone/server.js --name "cv4you" --cwd /var/www/cv4you/standalone
+            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start /var/www/cv4you/standalone/server.js --name "cv4you" --cwd /var/www/cv4you/standalone
