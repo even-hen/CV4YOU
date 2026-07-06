@@ -6,11 +6,49 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Beget VPS via SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Copy static files to standalone
+        run: |
+          cp -r public .next/standalone/ || true
+          cp -r .next/static .next/standalone/.next/
+
+      - name: Tar standalone files
+        run: |
+          cd .next/standalone
+          tar -czf ../../standalone.tar.gz .
+
+      - name: Upload standalone tarball to VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "standalone.tar.gz"
+          target: "/var/www/cv4you"
+
+      - name: Extract and deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -21,17 +59,23 @@ jobs:
           script: |
             cd /var/www/cv4you
             
-            # Fetch latest code
+            # Pull latest git commit (for schema updates and migrations)
             git pull origin main
             
-            # Install production/development dependencies
-            npm install
-            
-            # Run database migrations (Prisma)
+            # Run database migrations
             npx prisma migrate deploy
             
-            # Build Next.js application
-            npm run build
+            # Prepare standalone directory and extract
+            rm -rf standalone/*
+            mkdir -p standalone
+            tar -xzf standalone.tar.gz -C standalone/
+            rm standalone.tar.gz
             
-            # Restart the project in PM2 or start it if it's not running yet
-            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start .next/standalone/server.js --name "cv4you" --cwd /var/www/cv4you
+            # Copy production .env file to the standalone folder
+            cp .env standalone/.env || true
+            
+            # Clean up old source-based build artifacts and node_modules on VPS to save disk space (~1.2 GB)
+            rm -rf node_modules .next
+            
+            # Restart or start the PM2 process from the standalone build
+            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start standalone/server.js --name "cv4you" --cwd /var/www/cv4you/standalone
