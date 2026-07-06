@@ -142,7 +142,7 @@ Scoring rules:
 - Each missing mandatory requirement: deduct 10 points.
 - Each missing base requirement: deduct 5 points.
 - Nice-to-have matches add +2 to +5 bonus points each (cap total at 100).
-- If a mandatory requirement is completely absent, cap overallScore at 66.
+- If a mandatory requirement is completely absent, cap overallScore at 65.
 - Provide 3-5 strengths in "pros" and 3-5 gaps in "cons".
 - Be precise and honest. Do not inflate or deflate scores.`
 
