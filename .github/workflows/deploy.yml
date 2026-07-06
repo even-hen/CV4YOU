@@ -77,5 +77,8 @@ jobs:
             # Clean up old source-based build artifacts and node_modules on VPS to save disk space (~1.2 GB)
             rm -rf node_modules .next
             
-            # Restart or start the PM2 process from the standalone build
-            PORT=8001 pm2 restart cv4you --update-env || PORT=8001 pm2 start /var/www/cv4you/standalone/server.js --name "cv4you" --cwd /var/www/cv4you/standalone
+            # Delete any existing PM2 process configuration to avoid path conflicts
+            pm2 delete cv4you || true
+            
+            # Start the PM2 process from the standalone build
+            PORT=8001 pm2 start /var/www/cv4you/standalone/server.js --name "cv4you" --cwd /var/www/cv4you/standalone
