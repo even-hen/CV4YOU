@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { PLAN_LIMITS } from '@/lib/subscription'
+import { PLAN_LIMITS, getEffectiveTier } from '@/lib/subscription'
 import { VacancyCreateSchema } from '@/lib/validation'
 
 // GET /api/vacancies — list recruiter's vacancies
@@ -100,10 +100,11 @@ export async function POST(req: NextRequest) {
     where: { recruiterId, isActive: true },
   })
 
-  const limit = PLAN_LIMITS[user.subscriptionTier]
+  const effectiveTier = getEffectiveTier(user)
+  const limit = PLAN_LIMITS[effectiveTier]
   if (activeCount >= limit) {
     return NextResponse.json(
-      { error: `Active vacancy limit reached (${limit} for ${user.subscriptionTier} plan)`, limitReached: true },
+      { error: `Active vacancy limit reached (${limit} for ${effectiveTier} plan)`, limitReached: true },
       { status: 403 }
     )
   }

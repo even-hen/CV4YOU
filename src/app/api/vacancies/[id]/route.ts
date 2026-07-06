@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { PLAN_LIMITS } from '@/lib/subscription'
+import { PLAN_LIMITS, getEffectiveTier } from '@/lib/subscription'
 import { VacancyCreateSchema } from '@/lib/validation'
 
 type Params = { params: Promise<{ id: string }> }
@@ -50,7 +50,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (isActiveUpdate === true && !existing.isActive) {
     const user = await prisma.user.findUnique({ where: { id: recruiterId } })
     const activeCount = await prisma.vacancy.count({ where: { recruiterId, isActive: true } })
-    const limit = PLAN_LIMITS[user!.subscriptionTier]
+    const effectiveTier = getEffectiveTier(user!)
+    const limit = PLAN_LIMITS[effectiveTier]
     if (activeCount >= limit) {
       return NextResponse.json(
         { error: `Active vacancy limit reached (${limit})`, limitReached: true },

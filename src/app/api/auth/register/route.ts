@@ -40,16 +40,11 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await hashPassword(password)
 
-    // 14-day trial from now
-    const trialEndsAt = new Date()
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
-
     await prisma.user.create({
       data: {
         name: name || null,
         email,
         passwordHash,
-        trialEndsAt,
         subscriptionTier: 'BASIC',
         emailNotificationsEnabled: true,
         preferredTheme: 'dark',

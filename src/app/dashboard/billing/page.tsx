@@ -7,26 +7,36 @@ import { Suspense } from 'react'
 import { Check, Loader2, Shield, CreditCard, AlertTriangle } from 'lucide-react'
 
 const DURATIONS = [
-  { key: '1m', label: '1 Month', months: 1, saving: null },
-  { key: '3m', label: '3 Months', months: 3, saving: 'Save 11%' },
-  { key: '1y', label: '1 Year', months: 12, saving: 'Save 28%' },
+  { key: '1m', label: 'Monthly', months: 1, saving: null },
+  { key: '1y', label: 'Annual', months: 12, saving: 'Save 30%' },
 ] as const
 
 const PLANS = [
   {
     key: 'basic',
-    name: 'Basic',
+    name: 'Basic (Free)',
     limit: '10 active vacancies',
     features: ['Up to 10 active vacancies', 'AI CV matching & scoring', 'Candidate management', 'Email notifications', 'On-demand CV generation'],
-    prices: { '1m': 149, '3m': 399, '1y': 1299 },
+    prices: { '1m': 0, '1y': 0 },
     recommended: false,
   },
   {
     key: 'pro',
     name: 'Pro',
     limit: '30 active vacancies',
-    features: ['Up to 30 active vacancies', 'AI CV matching & scoring', 'Candidate management', 'Email notifications', 'On-demand CV generation', 'Priority support'],
-    prices: { '1m': 299, '3m': 799, '1y': 2499 },
+    features: [
+      'Up to 30 active vacancies',
+      'AI CV matching & scoring',
+      'Candidate management',
+      'Email notifications',
+      'On-demand CV generation',
+      'Priority support',
+      'Export candidates to CSV (Pro)',
+      'Share candidate by link (Pro)',
+      'Auto replies for candidates (Pro)',
+      'Custom branding (Pro)',
+    ],
+    prices: { '1m': 299, '1y': 2499 },
     recommended: true,
   },
 ] as const
@@ -34,16 +44,13 @@ const PLANS = [
 function BillingContent() {
   const { data: session } = useSession()
   const searchParams = useSearchParams()
-  const defaultPlan = searchParams.get('plan') === 'pro' ? 'pro' : 'basic'
 
   const user = session?.user as any
   const currentTier = user?.subscriptionTier?.toLowerCase() || 'basic'
   const subEndsAt = user?.subscriptionEndsAt ? new Date(user.subscriptionEndsAt) : null
-  const trialEndsAt = user?.trialEndsAt ? new Date(user.trialEndsAt) : null
   const now = new Date()
-  const inTrial = trialEndsAt && trialEndsAt > now && (!subEndsAt || subEndsAt <= now)
 
-  const [duration, setDuration] = useState<'1m' | '3m' | '1y'>('1m')
+  const [duration, setDuration] = useState<'1m' | '1y'>('1m')
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
 
@@ -72,11 +79,11 @@ function BillingContent() {
       <div className="mb-6">
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Billing & Plans</h1>
         <p className="text-muted text-sm mt-2">
-          {inTrial
-            ? `You are on a free trial. Trial ends ${trialEndsAt!.toLocaleDateString()}.`
-            : subEndsAt && subEndsAt > now
-              ? `Current plan: ${currentTier.toUpperCase()}. Active until ${subEndsAt.toLocaleDateString()}.`
-              : 'Your access has expired. Choose a plan to continue.'}
+          {currentTier === 'pro' && subEndsAt && subEndsAt > now
+            ? `Current plan: PRO. Active until ${subEndsAt.toLocaleDateString()}.`
+            : currentTier === 'pro'
+              ? 'Your PRO subscription has expired. You are now on the BASIC Free plan.'
+              : 'Current plan: BASIC (Free).'}
         </p>
       </div>
 
@@ -106,7 +113,9 @@ function BillingContent() {
       <div className="billing-grid">
         {PLANS.map(plan => {
           const price = plan.prices[duration]
-          const isCurrent = currentTier === plan.key && subEndsAt && subEndsAt > now
+          const isCurrent = plan.key === 'basic'
+            ? currentTier === 'basic'
+            : currentTier === 'pro' && subEndsAt && subEndsAt > now
           const planLoadingKey = `${plan.key}_${duration}`
 
           return (
@@ -119,9 +128,15 @@ function BillingContent() {
               </div>
 
               <div className="plan-price-row">
-                <span className="plan-currency">₽</span>
-                <span className="plan-price">{price.toLocaleString('ru')}</span>
-                <span className="plan-period">/ {DURATIONS.find(d => d.key === duration)?.label.toLowerCase()}</span>
+                {price === 0 ? (
+                  <span className="plan-price">Free</span>
+                ) : (
+                  <>
+                    <span className="plan-currency">₽</span>
+                    <span className="plan-price">{price.toLocaleString('ru')}</span>
+                    <span className="plan-period">/ {DURATIONS.find(d => d.key === duration)?.label.toLowerCase()}</span>
+                  </>
+                )}
               </div>
 
               <ul className="plan-features">
@@ -130,14 +145,16 @@ function BillingContent() {
 
               <button
                 className={`btn btn-full${plan.recommended ? ' btn-primary' : ' btn-secondary'}`}
-                disabled={!!isCurrent || loading === planLoadingKey}
+                disabled={plan.key === 'basic' || !!isCurrent || loading === planLoadingKey}
                 onClick={() => handlePurchase(plan.key)}
               >
                 {loading === planLoadingKey
                   ? <><Loader2 size={15} className="spin" /> Processing…</>
-                  : isCurrent
+                  : plan.key === 'basic'
                     ? <><Check size={15} /> Current Plan</>
-                    : `Pay ₽${price.toLocaleString('ru')}`
+                    : isCurrent
+                      ? <><Check size={15} /> Current Plan</>
+                      : `Pay ₽${price.toLocaleString('ru')}`
                 }
               </button>
             </div>

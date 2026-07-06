@@ -32,17 +32,18 @@ export const PLAN_PRICES_RUB: Record<string, number> = {
   pro_1y: 2499,
 }
 
-export function isAccessActive(user: Pick<User, 'trialEndsAt' | 'subscriptionEndsAt'>): boolean {
-  const now = new Date()
-  if (user.trialEndsAt > now) return true
-  if (user.subscriptionEndsAt && user.subscriptionEndsAt > now) return true
-  return false
+export function isAccessActive(): boolean {
+  return true
 }
 
-export function getTrialDaysLeft(trialEndsAt: Date): number {
-  const now = new Date()
-  const diff = trialEndsAt.getTime() - now.getTime()
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+export function getEffectiveTier(user: Pick<User, 'subscriptionTier' | 'subscriptionEndsAt'>): SubscriptionTier {
+  if (user.subscriptionTier === 'PRO') {
+    const now = new Date()
+    if (user.subscriptionEndsAt && user.subscriptionEndsAt > now) {
+      return 'PRO'
+    }
+  }
+  return 'BASIC'
 }
 
 export function getSubscriptionDaysLeft(subscriptionEndsAt: Date | null): number {

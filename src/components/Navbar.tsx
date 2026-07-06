@@ -187,14 +187,52 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
         {/* User Menu */}
         <div className="user-menu-wrapper" ref={menuRef}>
-          <button className="user-menu-btn" onClick={() => setMenuOpen(v => !v)} id="user-menu-btn">
+          <button className="user-menu-btn" onClick={() => setMenuOpen(v => !v)} id="user-menu-btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <User size={15} />
             <span className="truncate" style={{ maxWidth: 120 }}>{user?.name || user?.email || 'Account'}</span>
+            {user?.subscriptionTier === 'PRO' && (
+              <span 
+                className="badge-primary" 
+                style={{ 
+                  fontSize: '0.7rem', 
+                  fontWeight: 'bold', 
+                  padding: '1px 5px', 
+                  borderRadius: 4, 
+                  backgroundColor: 'var(--color-primary)', 
+                  color: 'white',
+                  cursor: 'help'
+                }}
+                title="PRO Features:&#10;• Export candidates to CSV&#10;• Share candidate by link&#10;• Auto replies for candidates&#10;• Custom branding"
+              >
+                PRO
+              </span>
+            )}
             <ChevronDown size={14} />
           </button>
 
           {menuOpen && (
             <div className="user-menu-dropdown">
+              <div style={{ padding: '8px 12px', fontSize: '0.75rem', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }}>
+                Plan: <strong style={{ color: user?.subscriptionTier === 'PRO' ? 'var(--color-primary)' : 'var(--color-text)' }}>{user?.subscriptionTier || 'BASIC'}</strong>
+                {user?.subscriptionTier === 'PRO' ? (
+                  <div style={{ marginTop: 6, fontSize: '0.7rem' }}>
+                    <div style={{ fontWeight: '600', marginBottom: 2 }}>PRO Features Active:</div>
+                    <ul style={{ margin: '4px 0 0 12px', padding: 0, listStyleType: 'disc', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <li>Export candidates to CSV</li>
+                      <li>Share candidate by link</li>
+                      <li>Auto replies for candidate</li>
+                      <li>Custom branding</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div style={{ marginTop: 4 }}>
+                    <Link href="/dashboard/billing" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }} onClick={() => setMenuOpen(false)}>
+                      Upgrade to PRO
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               <Link href="/dashboard/vacancies" className="user-menu-item" onClick={() => setMenuOpen(false)}>
                 <Briefcase size={15} /> Vacancies
               </Link>
@@ -225,69 +263,5 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
         </div>
       </div>
     </nav>
-  )
-}
-
-// Trial / Subscription Banner
-interface BannerProps {
-  trialEndsAt: string | null
-  subscriptionEndsAt: string | null
-  isActive: boolean
-}
-
-export function SubscriptionBanner({ trialEndsAt, subscriptionEndsAt, isActive }: BannerProps) {
-  const router = useRouter()
-  const now = new Date()
-
-  if (!isActive) return null // Paywall handles the expired state
-
-  // Check if in trial
-  const trialEnd = trialEndsAt ? new Date(trialEndsAt) : null
-  const subEnd = subscriptionEndsAt ? new Date(subscriptionEndsAt) : null
-  const inTrial = trialEnd && trialEnd > now && (!subEnd || subEnd <= now)
-
-  if (!inTrial) return null // Active subscription, no banner needed
-
-  const daysLeft = Math.max(0, Math.ceil((trialEnd!.getTime() - now.getTime()) / 86400000))
-  const urgent = daysLeft <= 3
-
-  return (
-    <div className={`trial-banner${urgent ? ' urgent' : ''}`}>
-      <div className="flex items-center gap-2">
-        {urgent ? <AlertTriangle size={16} /> : <Clock size={16} />}
-        <span>
-          {daysLeft === 0
-            ? 'Your free trial expires today!'
-            : `Free trial: ${daysLeft} day${daysLeft === 1 ? '' : 's'} remaining`}
-        </span>
-      </div>
-      <button className="btn btn-primary btn-sm" onClick={() => router.push('/dashboard/billing')}>
-        Upgrade now
-      </button>
-    </div>
-  )
-}
-
-// Paywall Overlay
-export function PaywallOverlay() {
-  const router = useRouter()
-  return (
-    <div className="paywall-overlay">
-      <div className="modal" style={{ maxWidth: 520 }}>
-        <div className="paywall-icon"><CreditCard size={40} /></div>
-        <h2 className="modal-title" style={{ textAlign: 'center' }}>Your access has expired</h2>
-        <p className="modal-body" style={{ textAlign: 'center' }}>
-          Your free trial or subscription has ended. Choose a plan to continue accessing your vacancies and candidate applications.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button className="btn btn-secondary" onClick={() => router.push('/dashboard/billing?plan=basic')}>
-            Basic — up to 10 jobs
-          </button>
-          <button className="btn btn-primary" onClick={() => router.push('/dashboard/billing?plan=pro')}>
-            Pro — up to 30 jobs
-          </button>
-        </div>
-      </div>
-    </div>
   )
 }

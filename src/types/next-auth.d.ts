@@ -5,7 +5,6 @@ declare module 'next-auth' {
   interface User extends DefaultUser {
     id: string
     subscriptionTier: string
-    trialEndsAt: string
     subscriptionEndsAt: string | null
     preferredTheme: string
     preferredLanguage: string
@@ -17,7 +16,6 @@ declare module 'next-auth' {
     user: {
       id: string
       subscriptionTier: string
-      trialEndsAt: string
       subscriptionEndsAt: string | null
       preferredTheme: string
       preferredLanguage: string
@@ -31,7 +29,6 @@ declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id: string
     subscriptionTier: string
-    trialEndsAt: string
     subscriptionEndsAt: string | null
     preferredTheme: string
     preferredLanguage: string

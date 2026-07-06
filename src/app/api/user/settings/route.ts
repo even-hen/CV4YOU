@@ -13,7 +13,6 @@ export async function GET() {
     select: {
       name: true,
       email: true,
-      trialEndsAt: true,
       subscriptionEndsAt: true,
       subscriptionTier: true,
       emailNotificationsEnabled: true,

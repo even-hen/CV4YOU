@@ -15,12 +15,7 @@ export function useSubscriptionGuard() {
   }, [session, status, router])
 
   const user = session?.user
-  const active = user
-    ? isAccessActive({
-        trialEndsAt: new Date(user.trialEndsAt),
-        subscriptionEndsAt: user.subscriptionEndsAt ? new Date(user.subscriptionEndsAt) : null,
-      })
-    : false
+  const active = user ? isAccessActive() : false
 
   return { session, status, user, isActive: active }
 }

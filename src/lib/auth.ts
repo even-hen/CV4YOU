@@ -27,7 +27,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: user.name,
           subscriptionTier: user.subscriptionTier,
-          trialEndsAt: user.trialEndsAt.toISOString(),
           subscriptionEndsAt: user.subscriptionEndsAt?.toISOString() ?? null,
           preferredTheme: user.preferredTheme,
           preferredLanguage: user.preferredLanguage,
@@ -46,7 +45,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (dbUser) {
           token.name = dbUser.name
           token.subscriptionTier = dbUser.subscriptionTier
-          token.trialEndsAt = dbUser.trialEndsAt.toISOString()
           token.subscriptionEndsAt = dbUser.subscriptionEndsAt?.toISOString() ?? null
           token.preferredTheme = dbUser.preferredTheme
           token.preferredLanguage = dbUser.preferredLanguage
@@ -58,7 +56,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id
         token.name = user.name
         token.subscriptionTier = user.subscriptionTier
-        token.trialEndsAt = user.trialEndsAt
         token.subscriptionEndsAt = user.subscriptionEndsAt
         token.preferredTheme = user.preferredTheme
         token.preferredLanguage = user.preferredLanguage
@@ -73,8 +70,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (token.name) {
           session.user.name = token.name as string
         }
-        session.user.subscriptionTier = token.subscriptionTier
-        session.user.trialEndsAt = token.trialEndsAt
+        
+        // Calculate effective tier: downgrade to BASIC if PRO subscription has expired
+        const tier = token.subscriptionTier as string
+        const subEndsAt = token.subscriptionEndsAt ? new Date(token.subscriptionEndsAt as string) : null
+        const now = new Date()
+        
+        if (tier === 'PRO' && (!subEndsAt || subEndsAt <= now)) {
+          session.user.subscriptionTier = 'BASIC'
+        } else {
+          session.user.subscriptionTier = tier
+        }
+        
         session.user.subscriptionEndsAt = token.subscriptionEndsAt
         session.user.preferredTheme = token.preferredTheme
         session.user.preferredLanguage = token.preferredLanguage

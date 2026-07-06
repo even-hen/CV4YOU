@@ -46,7 +46,7 @@ export default function RegisterPage() {
         <div className="auth-logo">CV4YOU</div>
         <h1 className="auth-title">Start hiring smarter</h1>
         <p className="auth-subtitle">
-          Free 14-day trial &mdash; no credit card required
+          Free Basic plan &mdash; up to 10 active vacancies
         </p>
 
         {error && (
@@ -104,10 +104,6 @@ export default function RegisterPage() {
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-          </div>
-
-          <div className="auth-trial-note">
-            🎉 You&apos;ll get <strong>14 days free</strong> with Basic plan access (up to 10 active vacancies).
           </div>
 
           <button type="submit" className="btn btn-primary btn-full mt-4" disabled={loading}>

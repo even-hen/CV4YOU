@@ -3,8 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Navbar, SubscriptionBanner, PaywallOverlay } from '@/components/Navbar'
-import { isAccessActive } from '@/lib/subscription'
+import { Navbar } from '@/components/Navbar'
 
 interface Notification {
   id: string
@@ -95,27 +94,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!session) return null
 
-  const user = session.user
-  const trialEndsAt = dbUser ? dbUser.trialEndsAt : (user?.trialEndsAt || null)
-  const subscriptionEndsAt = dbUser ? dbUser.subscriptionEndsAt : (user?.subscriptionEndsAt || null)
-  const active = isAccessActive({
-    trialEndsAt: trialEndsAt ? new Date(trialEndsAt) : new Date(0),
-    subscriptionEndsAt: subscriptionEndsAt ? new Date(subscriptionEndsAt) : null,
-  })
-
   return (
     <div className="dashboard-shell">
       <Navbar
         unreadCount={unreadCount}
         onMarkAllRead={markAllRead}
       />
-      {!active && <PaywallOverlay />}
       <main className="page-content">{children}</main>
-      <SubscriptionBanner
-        trialEndsAt={trialEndsAt}
-        subscriptionEndsAt={subscriptionEndsAt}
-        isActive={active}
-      />
     </div>
   )
 }
