@@ -20,8 +20,9 @@ function getDefaultHeaders(): Record<string, string> {
   return {
     Authorization: `Bearer ${API_KEY}`,
     'Content-Type': 'application/json',
-    'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    'HTTP-Referer': 'https://github.com/cv4you', // Neutral referrer to bypass .ru TLD blocking
     'X-Title': 'CV4YOU',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', // Standard User-Agent header
   }
 }
 
