@@ -329,12 +329,12 @@ export default function CandidatesPage() {
               style={{ gap: 6 }}
             >
               <SlidersHorizontal size={14} />
-              <span>{threshold}%</span>
+              <span>{threshold === 0 ? 'All' : `${threshold}%`}</span>
               <ChevronDown size={13} />
             </button>
             {thresholdOpen && (
               <div className="user-menu-dropdown" style={{ minWidth: 120, left: 0, top: 'calc(100% + 6px)' }}>
-                {[95, 90, 85, 80, 75, 70, 65, 60, 55, 50].map(val => (
+                {[95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 0].map(val => (
                   <button
                     key={val}
                     type="button"
@@ -346,7 +346,7 @@ export default function CandidatesPage() {
                   >
                     {threshold === val && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
                     {threshold !== val && <span style={{ width: 14 }} />}
-                    {val}%
+                    {val === 0 ? 'All' : `${val}%`}
                   </button>
                 ))}
               </div>

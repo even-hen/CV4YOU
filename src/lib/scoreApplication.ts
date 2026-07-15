@@ -11,11 +11,8 @@
  * This function is called fire-and-forget from the apply route.
  * It never throws — all errors are logged and swallowed.
  */
-
 import { prisma } from '@/lib/prisma'
 import { scoreCVAgainstVacancy } from '@/lib/openrouter'
-
-const PURGE_THRESHOLD = 50 // Delete applications scoring below this
 
 export async function runScoringPipeline(applicationId: string): Promise<void> {
   try {
@@ -59,14 +56,7 @@ export async function runScoringPipeline(applicationId: string): Promise<void> {
       language: v.recruiter.preferredLanguage,
     })
 
-    // 3 — Auto-purge low-scoring applications
-    if (score.overallScore < PURGE_THRESHOLD) {
-      await prisma.candidateApplication.delete({ where: { id: applicationId } })
-      console.log(`[scoring] Purged application ${applicationId} (score: ${score.overallScore})`)
-      return
-    }
-
-    // 4 — Store score
+    // 3 — Store score
     await prisma.candidateApplication.update({
       where: { id: applicationId },
       data: {

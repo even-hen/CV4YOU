@@ -126,6 +126,37 @@ export async function scoreCVAgainstVacancy(params: {
   language?: string
 }): Promise<LLMScoreResult> {
   const language = params.language || 'Russian'
+  const hasMandatory = !!params.mandatoryRequirements?.trim()
+  const hasNiceToHave = !!params.niceToHave?.trim()
+  const hasResponsibilities = !!params.responsibilities?.trim()
+
+  const rules: string[] = [
+    'Base score starts at 100.',
+    'Evaluate Base Requirements: Deduct points proportionally to the fraction of missing base requirements. Deduct up to 40 points total (e.g., if 5 out of 10 base requirements are missing (50%), deduct 20 points; if 2 out of 4 are missing (50%), deduct 20 points).',
+  ]
+
+  if (hasMandatory) {
+    rules.push('Evaluate Mandatory Requirements: Deduct points proportionally to the fraction of missing mandatory requirements. Deduct up to 30 points total (e.g., if 1 out of 2 mandatory requirements is missing (50%), deduct 15 points).')
+  }
+
+  if (hasNiceToHave) {
+    rules.push('Evaluate Nice-to-Have Requirements: Add bonus points proportionally to the fraction of matched nice-to-have requirements. Add up to 10 points total (e.g., if 1 out of 2 nice-to-haves is matched (50%), add +5 points).')
+  }
+
+  if (hasResponsibilities) {
+    rules.push("Evaluate Responsibilities Alignment: Compare the candidate's past work responsibilities in their CV against the responsibilities of the vacancy. Deduct points proportionally to the fraction of vacancy responsibilities that are missing from or unaddressed by the candidate's experience. Deduct up to 20 points total.")
+  }
+
+  if (hasMandatory) {
+    rules.push("Mandatory Capping: If any mandatory requirement specified in the vacancy is completely missing from the candidate's CV, the final overallScore must be capped at a maximum of 65.")
+  }
+
+  rules.push(
+    'The final overallScore must be between 0 and 100 (cap at 100, floor at 0).',
+    'Provide 3-5 strengths in "pros" and 3-5 gaps in "cons".',
+    'Be precise and honest. Do not inflate or deflate scores.'
+  )
+
   const systemPrompt = `You are an expert AI recruitment analyst. Your task is to evaluate a candidate's CV against a job vacancy.
 This evaluation must be objective, analytical, and tailored strictly to the evidence present in the text.
 Return ONLY a valid JSON object with this exact shape (no markdown, no extra text).
@@ -135,36 +166,30 @@ All text values must be in ${language}.
   "overallScore": <integer 0-100>,
   "summary": "<2-3 sentence overview>",
   "pros": ["<strength>", ...],
-  "cons": ["<gap>", ...],
+  "cons": ["<gap>", ...]
 }
 
 Scoring rules:
-- Start from 100 and deduct points.
-- Each missing mandatory requirement: deduct 10 points.
-- Each missing base requirement: deduct 5 points.
-- Nice-to-have matches add +2 to +5 bonus points each (cap total at 100).
-- If a mandatory requirement is completely absent, cap overallScore at 65.
-- Provide 3-5 strengths in "pros" and 3-5 gaps in "cons".
-- Be precise and honest. Do not inflate or deflate scores.`
+${rules.map((r, i) => `${i + 1}. ${r}`).join('\n')}`
 
-  const responsibilitiesBlock = params.responsibilities
+  const responsibilitiesBlock = hasResponsibilities
     ? `**Responsibilities:**\n${params.responsibilities}\n\n`
+    : ''
+
+  const mandatoryBlock = hasMandatory
+    ? `**Mandatory Requirements:**\n${params.mandatoryRequirements}\n\n`
+    : ''
+
+  const niceToHaveBlock = hasNiceToHave
+    ? `**Nice to Have:**\n${params.niceToHave}\n\n`
     : ''
 
   const userPrompt = `## Job Vacancy
 
-${responsibilitiesBlock}
-
-**Base Requirements:**
+${responsibilitiesBlock}**Base Requirements:**
 ${params.baseRequirements}
 
-**Mandatory Requirements:**
-${params.mandatoryRequirements}
-
-**Nice to Have:**
-${params.niceToHave}
-
-## Candidate CV Text
+${mandatoryBlock}${niceToHaveBlock}## Candidate CV Text
 ${params.cvText}
 
 Evaluate this candidate and return only the JSON object.`
