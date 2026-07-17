@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     '.prisma/client',
     'prisma',
   ],
+  httpAgentOptions: {
+    keepAlive: true,
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
