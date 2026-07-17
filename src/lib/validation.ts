@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const RegisterSchema = z.object({
-  name: z.string().max(100).optional(),
+  name: z.string({ message: "Name is required" }).min(1, "Name is required").max(100),
   email: z.string().email().max(255),
   password: z.string().min(8).max(128),
 })

@@ -9,7 +9,7 @@ import { RegisterSchema } from '@/lib/validation'
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
-    const { allowed, retryAfterMs } = checkRateLimit(`register:${ip}`, 5, 900000)
+    const { allowed, retryAfterMs } = checkRateLimit(`register:${ip}`, 10, 900000)
     if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },

@@ -8,7 +8,15 @@ interface RateLimitEntry {
   resetAt: number
 }
 
-const store = new Map<string, RateLimitEntry>()
+const globalForRateLimit = globalThis as unknown as {
+  rateLimitStore: Map<string, RateLimitEntry>
+}
+
+if (!globalForRateLimit.rateLimitStore) {
+  globalForRateLimit.rateLimitStore = new Map()
+}
+
+const store = globalForRateLimit.rateLimitStore
 
 // Clean up expired entries every 5 minutes
 setInterval(() => {
