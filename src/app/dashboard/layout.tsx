@@ -19,7 +19,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       try {
         const res = await fetch('/api/user/settings')
         if (res.ok) {
-          const _data = await res.json()
           update()
         }
       } catch (err) {
