@@ -119,10 +119,21 @@ export async function POST(req: NextRequest) {
     company, role, responsibilities, baseRequirements,
     mandatoryRequirements, niceToHave, requestedContacts,
     salaryExpectation, knockoutQuestions, linkEnabled,
+    hhVacancyId, hhVacancyTitle, hhSyncEnabled
   } = parsed.data
 
   if (!company || !role || !baseRequirements) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  // Enforce 1-to-1 HeadHunter vacancy unique mapping constraint
+  if (hhVacancyId) {
+    const existingLink = await prisma.vacancy.findFirst({
+      where: { hhVacancyId, isActive: true }
+    })
+    if (existingLink) {
+      return NextResponse.json({ error: 'This HeadHunter vacancy is already connected to another vacancy in CV4YOU.' }, { status: 400 })
+    }
   }
 
   const vacancy = await prisma.vacancy.create({
@@ -139,6 +150,9 @@ export async function POST(req: NextRequest) {
       knockoutQuestions: JSON.stringify(knockoutQuestions || []),
       linkEnabled: linkEnabled !== false,
       isActive: true,
+      hhVacancyId: hhVacancyId || null,
+      hhVacancyTitle: hhVacancyTitle || null,
+      hhSyncEnabled: hhSyncEnabled !== false,
     },
   })
 

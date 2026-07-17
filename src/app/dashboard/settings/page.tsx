@@ -1,13 +1,15 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useState } from 'react'
-import { Save, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Save, Loader2, Link2, Unlink } from 'lucide-react'
 
 export default function SettingsPage() {
   const { data: session, update } = useSession()
   const user = session?.user as any
 
+  const searchParams = useSearchParams()
   const [emailNotif, setEmailNotif] = useState<boolean>(user?.emailNotificationsEnabled ?? true)
   const [minScoreNotif, setMinScoreNotif] = useState<number>(user?.minScoreEmailNotif ?? 50)
   const [name, setName] = useState<string>(user?.name || '')
@@ -15,6 +17,57 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+
+  const [hhConnected, setHhConnected] = useState<boolean>(false)
+  const [hhEmployerId, setHhEmployerId] = useState<string | null>(null)
+  const [hhLoading, setHhLoading] = useState<boolean>(true)
+  const [hhDisconnecting, setHhDisconnecting] = useState<boolean>(false)
+
+  useEffect(() => {
+    async function fetchHhStatus() {
+      try {
+        const res = await fetch('/api/integrations/hh/status')
+        if (res.ok) {
+          const data = await res.json()
+          setHhConnected(data.connected)
+          setHhEmployerId(data.employerId)
+        }
+      } catch (err) {
+        console.error('Failed to fetch hh integration status', err)
+      } finally {
+        setHhLoading(false)
+      }
+    }
+    fetchHhStatus()
+  }, [])
+
+  useEffect(() => {
+    const hhResult = searchParams.get('hh')
+    if (hhResult === 'success') {
+      setSaved(true)
+      window.history.replaceState({}, document.title, window.location.pathname)
+      setTimeout(() => setSaved(false), 3000)
+    } else if (hhResult === 'error') {
+      setError('Failed to connect your HeadHunter account. Please try again.')
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [searchParams])
+
+  async function handleHhDisconnect() {
+    if (!confirm('Are you sure you want to disconnect HeadHunter? This will unlink all mapped vacancies.')) return
+    setHhDisconnecting(true)
+    setError('')
+    try {
+      const res = await fetch('/api/integrations/hh/disconnect', { method: 'POST' })
+      if (!res.ok) throw new Error()
+      setHhConnected(false)
+      setHhEmployerId(null)
+    } catch {
+      setError('Failed to disconnect HeadHunter integration. Please try again.')
+    } finally {
+      setHhDisconnecting(false)
+    }
+  }
 
   async function handleSave() {
     setSaving(true); setSaved(false); setError('')
@@ -146,6 +199,48 @@ export default function SettingsPage() {
             </div>
           </div>
           <a href="/dashboard/billing" className="btn btn-secondary btn-sm">Manage billing</a>
+        </div>
+      </div>
+
+      {/* HeadHunter Integration */}
+      <div className="settings-section">
+        <h2 className="settings-section-title">Integrations</h2>
+        <div className="settings-row">
+          <div>
+            <div className="settings-row-label">HeadHunter (hh.ru)</div>
+            <div className="settings-row-desc">
+              {hhLoading ? (
+                'Loading status…'
+              ) : hhConnected ? (
+                <>Connected {hhEmployerId && `(Employer ID: ${hhEmployerId})`}</>
+              ) : (
+                'Connect your HeadHunter account to link and sync vacancies'
+              )}
+            </div>
+          </div>
+          {!hhLoading && (
+            hhConnected ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', gap: 5 }}
+                onClick={handleHhDisconnect}
+                disabled={hhDisconnecting}
+              >
+                {hhDisconnecting ? <Loader2 size={13} className="spin" /> : <Unlink size={13} />}
+                Disconnect
+              </button>
+            ) : (
+              <a
+                href="/api/integrations/hh/authorize"
+                className="btn btn-secondary btn-sm"
+                style={{ gap: 5 }}
+              >
+                <Link2 size={13} />
+                Connect account
+              </a>
+            )
+          )}
         </div>
       </div>
 

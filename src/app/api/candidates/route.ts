@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   // Verify recruiter owns this vacancy
   const vacancy = await prisma.vacancy.findFirst({
     where: { id: vacancyId, recruiterId: session.user.id as string },
-    select: { id: true, company: true, role: true },
+    select: { id: true, company: true, role: true, hhVacancyId: true, hhVacancyTitle: true, hhSyncEnabled: true },
   })
   if (!vacancy) return NextResponse.json({ error: 'Vacancy not found' }, { status: 404 })
 
@@ -110,7 +110,14 @@ export async function GET(req: NextRequest) {
   const hasMore = endIndex < total
 
   return NextResponse.json({
-    vacancy: { id: vacancy.id, company: vacancy.company, role: vacancy.role },
+    vacancy: { 
+      id: vacancy.id, 
+      company: vacancy.company, 
+      role: vacancy.role,
+      hhVacancyId: vacancy.hhVacancyId,
+      hhVacancyTitle: vacancy.hhVacancyTitle,
+      hhSyncEnabled: vacancy.hhSyncEnabled,
+    },
     candidates: paginatedCandidates,
     total,
     newCount,

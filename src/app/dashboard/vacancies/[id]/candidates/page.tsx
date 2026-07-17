@@ -1,20 +1,24 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ArrowLeft, ArrowUpDown, Search, SlidersHorizontal, Download, Eye, EyeOff,
-  ChevronDown, Loader2, User, Phone, Mail, Star, Calendar,
-  TrendingUp, CheckCircle2, XCircle, AlertTriangle, Trash2,
-  RefreshCw, FileText, ChevronRight, Check
+  ChevronDown, Loader2, Phone, Mail, Calendar,
+  CheckCircle2, XCircle, AlertTriangle, Trash2,
+  RefreshCw, ChevronRight, Check
 } from 'lucide-react'
 
 interface Vacancy {
   id: string
   company: string
   role: string
+  hhVacancyId?: string | null
+  hhVacancyTitle?: string | null
+  hhSyncEnabled?: boolean
 }
+
 
 interface Candidate {
   id: string
@@ -47,27 +51,114 @@ function ScoreBadge({ score, status }: { score: number | null; status?: string }
   return <span className={`score-badge ${cls}`}>{score}</span>
 }
 
-function ScoreBar({ value, label }: { value: number; label: string }) {
-  const cls = value >= 80 ? 'bar-high' : value >= 65 ? 'bar-mid' : 'bar-low'
-  return (
-    <div className="score-bar-row">
-      <span className="score-bar-label">{label}</span>
-      <div className="score-bar-track">
-        <div className={`score-bar-fill ${cls}`} style={{ width: `${value}%` }} />
-      </div>
-      <span className="score-bar-value">{value}</span>
-    </div>
-  )
-}
+
 
 export default function CandidatesPage() {
   const { id: vacancyId } = useParams<{ id: string }>()
-  const router = useRouter()
 
   const [vacancy, setVacancy] = useState<Vacancy | null>(null)
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [loading, setLoading] = useState(true)
   const [newCount, setNewCount] = useState(0)
+
+  const [syncing, setSyncing] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importUrl, setImportUrl] = useState('')
+  const [hhAuthExpired, setHhAuthExpired] = useState(false)
+  const [hhStatusLoading, setHhStatusLoading] = useState(true)
+  // Inline toast messages replacing alert()
+  const [syncMessage, setSyncMessage] = useState<{ type: 'success' | 'error' | 'warn'; text: string } | null>(null)
+  const [importMessage, setImportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  function showSyncMsg(type: 'success' | 'error' | 'warn', text: string) {
+    setSyncMessage({ type, text })
+    setTimeout(() => setSyncMessage(null), 5000)
+  }
+  function showImportMsg(type: 'success' | 'error', text: string) {
+    setImportMessage({ type, text })
+    setTimeout(() => setImportMessage(null), 5000)
+  }
+
+  useEffect(() => {
+    async function checkHhStatus() {
+      try {
+        const res = await fetch('/api/integrations/hh/status')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.connected && data.isExpired) {
+            setHhAuthExpired(true)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to check hh connection status:', err)
+      } finally {
+        setHhStatusLoading(false)
+      }
+    }
+    checkHhStatus()
+  }, [])
+
+  async function handleSyncNow() {
+    setSyncing(true)
+    setSyncMessage(null)
+    setHhAuthExpired(false)
+    try {
+      const res = await fetch('/api/integrations/hh/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vacancyId }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (res.status === 401) {
+          setHhAuthExpired(true)
+        }
+        showSyncMsg('error', data.error || 'Failed to sync')
+        return
+      }
+      const msg = data.imported > 0
+        ? `Sync complete — imported ${data.imported} new candidate${data.imported !== 1 ? 's' : ''}.`
+        : 'Sync complete — no new candidates found.'
+      showSyncMsg(data.syncPaused ? 'warn' : 'success',
+        data.syncPaused ? `${msg} (Note: background auto-sync is paused for this vacancy.)` : msg
+      )
+      fetchCandidates(1, false)
+    } catch (e: any) {
+      showSyncMsg('error', e.message || 'Error occurred during sync')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  async function handleImportLink(e: React.FormEvent) {
+    e.preventDefault()
+    if (!importUrl.trim()) return
+    setImporting(true)
+    setImportMessage(null)
+    try {
+      const res = await fetch('/api/integrations/hh/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vacancyId, resumeUrl: importUrl.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (res.status === 401) {
+          setHhAuthExpired(true)
+        }
+        showImportMsg('error', data.error || 'Failed to import')
+        return
+      }
+      showImportMsg('success', `Imported "${data.candidateName}" — AI scoring started.`)
+      setImportUrl('')
+      fetchCandidates(1, false)
+    } catch (e: any) {
+      showImportMsg('error', e.message || 'Failed to import candidate link')
+    } finally {
+      setImporting(false)
+    }
+  }
+
 
   const [tab, setTab] = useState<TabKey>('new')
   const [sort, setSort] = useState<SortKey>('score')
@@ -211,7 +302,7 @@ export default function CandidatesPage() {
       a.download = `${c.candidateName.replace(/\s+/g, '_')}_CV.txt`
       a.click()
       URL.revokeObjectURL(url)
-    } catch (e) {
+    } catch (_e) {
       alert('Failed to generate CV. Please try again.')
     } finally {
       setDownloading(null)
@@ -249,7 +340,7 @@ export default function CandidatesPage() {
           )
         )
       }
-    } catch (e) {
+    } catch (_e) {
       alert('Failed to retry AI scoring. Please try again.')
     } finally {
       setRetrying(null)
@@ -299,6 +390,125 @@ export default function CandidatesPage() {
           )}
         </div>
       </div>
+
+      {/* HeadHunter Expired Alert Banner — only shown after status check resolves */}
+      {!hhStatusLoading && vacancy?.hhVacancyId && hhAuthExpired && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.08)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
+            <AlertTriangle size={16} />
+            HeadHunter Connection Expired
+          </div>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
+            HeadHunter synchronization is paused because your credentials have expired or were revoked. Please reconnect your account.
+          </p>
+          <div>
+            <a href="/dashboard/settings" className="btn btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              Reconnect in Settings
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* HeadHunter Integration Panel — only shown after status check resolves to prevent flicker */}
+      {!hhStatusLoading && vacancy?.hhVacancyId && !hhAuthExpired && (
+        <div style={{
+          background: 'var(--color-primary-dim)',
+          border: '1px solid var(--color-primary)',
+          borderRadius: 'var(--radius-md)',
+          padding: '16px',
+          marginBottom: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                🔗 Connected to hh.ru: "{vacancy.hhVacancyTitle || vacancy.hhVacancyId}"
+              </span>
+              {!vacancy.hhSyncEnabled && (
+                <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 500, marginTop: 2 }}>
+                  ⚠️ Background sync is paused.
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                style={{ height: '32px', gap: 6 }}
+                onClick={handleSyncNow}
+                disabled={syncing}
+              >
+                {syncing ? <Loader2 size={13} className="spin" /> : <RefreshCw size={13} />}
+                {syncing ? 'Syncing…' : 'Sync Now'}
+              </button>
+              {/* Inline sync result toast */}
+              {syncMessage && (
+                <span style={{
+                  fontSize: '0.78rem',
+                  fontWeight: 500,
+                  color: syncMessage.type === 'success' ? 'var(--color-success)'
+                    : syncMessage.type === 'warn' ? '#f59e0b'
+                    : 'var(--color-danger)',
+                  maxWidth: 320,
+                  textAlign: 'right',
+                  lineHeight: 1.4,
+                }}>
+                  {syncMessage.text}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px dashed rgba(79, 70, 229, 0.2)', paddingTop: 12 }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 600, display: 'block', marginBottom: 6 }}>
+              Import candidate by resume link:
+            </span>
+            <form onSubmit={handleImportLink} style={{ display: 'flex', gap: 8 }}>
+              <input
+                type="url"
+                className="form-input"
+                style={{ flex: 1, height: '32px', fontSize: '0.8125rem', padding: '0 10px' }}
+                placeholder="e.g. https://hh.ru/resume/502ff8b100018bdd..."
+                value={importUrl}
+                onChange={e => setImportUrl(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                className="btn btn-secondary btn-sm"
+                style={{ height: '32px', padding: '0 12px' }}
+                disabled={importing}
+              >
+                {importing ? <Loader2 size={13} className="spin" /> : 'Import'}
+              </button>
+            </form>
+            {/* Inline import result toast */}
+            {importMessage && (
+              <p style={{
+                margin: '6px 0 0',
+                fontSize: '0.78rem',
+                fontWeight: 500,
+                color: importMessage.type === 'success' ? 'var(--color-success)' : 'var(--color-danger)',
+              }}>
+                {importMessage.text}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
 
       {/* White Dashboard Container */}
       <div className="dashboard-container">

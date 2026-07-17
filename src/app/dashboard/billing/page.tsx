@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
-import { Check, Loader2, Shield, CreditCard, AlertTriangle } from 'lucide-react'
+import { Check, Loader2, Shield, AlertTriangle } from 'lucide-react'
 
 const DURATIONS = [
   { key: '1m', label: 'Monthly', months: 1, saving: null },
@@ -43,7 +43,7 @@ const PLANS = [
 
 function BillingContent() {
   const { data: session } = useSession()
-  const searchParams = useSearchParams()
+  const _searchParams = useSearchParams()
 
   const user = session?.user as any
   const currentTier = user?.subscriptionTier?.toLowerCase() || 'basic'

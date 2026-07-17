@@ -39,6 +39,23 @@ model User {
   vacancies     Vacancy[]
   notifications Notification[]
   payments      PaymentTransaction[]
+  hhIntegration HhIntegration?
+}
+
+model HhIntegration {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime // Access token expiry timestamp
+  
+  hhUserId     String?  // Recruiter's personal user ID on hh.ru
+  employerId   String?  // Recruiter's company/employer ID on hh.ru
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Vacancy {
@@ -64,6 +81,10 @@ model Vacancy {
 
   linkEnabled Boolean @default(true)
   isActive    Boolean @default(true)
+
+  hhVacancyId    String? @unique // Linked vacancy ID on hh.ru
+  hhVacancyTitle String?        // Linked vacancy title on hh.ru
+  hhSyncEnabled  Boolean @default(true) // Toggle background polling
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -98,6 +119,10 @@ model CandidateApplication {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  hhResumeId      String? // Resume ID on hh.ru
+  hhNegotiationId String? // Negotiation/Application ID on hh.ru
+
+  @@unique([vacancyId, hhResumeId])
   @@index([vacancyId, status])
   @@index([vacancyId, seen])
 }

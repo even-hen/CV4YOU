@@ -60,8 +60,19 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
   }
 
-  // Requirement 1: When archiving, disable candidate link
+  // Enforce 1-to-1 HeadHunter vacancy unique mapping constraint
+  if (data.hhVacancyId && data.hhVacancyId !== existing.hhVacancyId) {
+    const existingLink = await prisma.vacancy.findFirst({
+      where: { hhVacancyId: data.hhVacancyId, isActive: true, NOT: { id } }
+    })
+    if (existingLink) {
+      return NextResponse.json({ error: 'This HeadHunter vacancy is already connected to another vacancy in CV4YOU.' }, { status: 400 })
+    }
+  }
+
+  // Requirement: When archiving, disable candidate link
   const finalLinkEnabled = isActiveUpdate === false ? false : linkEnabledUpdate
+  const isArchiving = isActiveUpdate === false
 
   const updated = await prisma.vacancy.update({
     where: { id },
@@ -77,13 +88,16 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       ...(data.knockoutQuestions !== undefined && { knockoutQuestions: JSON.stringify(data.knockoutQuestions) }),
       ...(finalLinkEnabled !== undefined && { linkEnabled: finalLinkEnabled }),
       ...(isActiveUpdate !== undefined && { isActive: isActiveUpdate }),
+      hhVacancyId: isArchiving ? null : (data.hhVacancyId !== undefined ? data.hhVacancyId : undefined),
+      hhVacancyTitle: isArchiving ? null : (data.hhVacancyTitle !== undefined ? data.hhVacancyTitle : undefined),
+      hhSyncEnabled: isArchiving ? false : (data.hhSyncEnabled !== undefined ? data.hhSyncEnabled : undefined),
     },
   })
 
   return NextResponse.json({ id: updated.id })
 }
 
-// DELETE /api/vacancies/[id] — archives (sets isActive=false)
+// DELETE /api/vacancies/[id] — archives (sets isActive=false, unlinks hh.ru vacancy)
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -92,6 +106,15 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   const existing = await getVacancyOwned(id, session.user.id as string)
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  await prisma.vacancy.update({ where: { id }, data: { isActive: false, linkEnabled: false } })
+  await prisma.vacancy.update({
+    where: { id },
+    data: {
+      isActive: false,
+      linkEnabled: false,
+      hhVacancyId: null,
+      hhVacancyTitle: null,
+      hhSyncEnabled: false,
+    }
+  })
   return NextResponse.json({ success: true })
 }

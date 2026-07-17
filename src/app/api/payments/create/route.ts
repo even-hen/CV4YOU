@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { PLAN_DAYS, PLAN_TIER, PLAN_PRICES_RUB } from '@/lib/subscription'
+import { PLAN_DAYS, PLAN_PRICES_RUB } from '@/lib/subscription'
 import crypto from 'crypto'
 
 const SHOP_ID = process.env.YOOKASSA_SHOP_ID || ''

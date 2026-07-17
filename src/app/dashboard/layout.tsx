@@ -5,19 +5,11 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/Navbar'
 
-interface Notification {
-  id: string
-  message: string
-  link?: string
-  read: boolean
-  createdAt: string
-}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status, update } = useSession()
   const router = useRouter()
   const [unreadCount, setUnreadCount] = useState<number>(0)
-  const [dbUser, setDbUser] = useState<any>(null)
   const syncedRef = useRef(false)
 
   useEffect(() => {
@@ -27,8 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       try {
         const res = await fetch('/api/user/settings')
         if (res.ok) {
-          const data = await res.json()
-          setDbUser(data)
+          const _data = await res.json()
           update()
         }
       } catch (err) {

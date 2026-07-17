@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Plus, Trash2, Loader2, ArrowLeft, ExternalLink,
-  Unlink, Copy, Check, Info, Archive, Link2
+  Plus, Trash2, Loader2, ArrowLeft,
+  Check, Info, Archive, Link2
 } from 'lucide-react'
 
 export interface KOQuestion {
@@ -25,6 +25,9 @@ export interface VacancyFormData {
   knockoutQuestions: KOQuestion[]
   linkEnabled: boolean
   isActive?: boolean
+  hhVacancyId?: string | null
+  hhVacancyTitle?: string | null
+  hhSyncEnabled?: boolean
 }
 
 const EMPTY_FORM: VacancyFormData = {
@@ -39,7 +42,11 @@ const EMPTY_FORM: VacancyFormData = {
   knockoutQuestions: [],
   linkEnabled: true,
   isActive: true,
+  hhVacancyId: null,
+  hhVacancyTitle: null,
+  hhSyncEnabled: true,
 }
+
 
 const CONTACT_OPTIONS = [
   { key: 'phone', label: 'Phone number' },
@@ -67,6 +74,35 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
   const [confirmArchive, setConfirmArchive] = useState(false)
   const [error, setError] = useState('')
   const [copiedLink, setCopiedLink] = useState(false)
+
+  const [hhConnected, setHhConnected] = useState(false)
+  const [hhVacancies, setHhVacancies] = useState<{ id: string; name: string }[]>([])
+  const [loadingHh, setLoadingHh] = useState(true)
+
+  useEffect(() => {
+    async function checkHhIntegration() {
+      try {
+        const statusRes = await fetch('/api/integrations/hh/status')
+        if (statusRes.ok) {
+          const statusData = await statusRes.json()
+          if (statusData.connected) {
+            setHhConnected(true)
+            const vacanciesRes = await fetch('/api/integrations/hh/vacancies')
+            if (vacanciesRes.ok) {
+              const vacanciesData = await vacanciesRes.json()
+              setHhVacancies(vacanciesData.vacancies || [])
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load HeadHunter integration:', err)
+      } finally {
+        setLoadingHh(false)
+      }
+    }
+    checkHhIntegration()
+  }, [])
+
 
   async function handleArchive() {
     if (!vacancyId) return
@@ -381,7 +417,76 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           </div>
         </div>
 
+        {/* HeadHunter Linkage */}
+        {!loadingHh && hhConnected && (
+          <div>
+            <div className="divider" />
+            <p className="section-title" style={{ marginBottom: 2 }}>HeadHunter Integration</p>
+            <p className="text-xs text-muted" style={{ marginBottom: 12 }}>
+              Connect this vacancy to an active vacancy on hh.ru to automatically import and score applicants.
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 480 }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <select
+                  className="form-input"
+                  style={{ flex: 1, cursor: 'pointer' }}
+                  value={form.hhVacancyId || ''}
+                  onChange={e => {
+                    const selectedId = e.target.value
+                    const v = hhVacancies.find(x => x.id === selectedId)
+                    update('hhVacancyId', selectedId || null)
+                    update('hhVacancyTitle', v ? v.name : null)
+                    // Reset sync flag to enabled when a new vacancy is linked
+                    if (selectedId) update('hhSyncEnabled', true)
+                  }}
+                >
+                  <option value="">-- Select hh.ru Vacancy --</option>
+                  {hhVacancies.map(v => (
+                    <option key={v.id} value={v.id}>{v.name} (ID: {v.id})</option>
+                  ))}
+                </select>
+                {form.hhVacancyId && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                    onClick={() => {
+                      update('hhVacancyId', null)
+                      update('hhVacancyTitle', null)
+                      update('hhSyncEnabled', false)
+                    }}
+                  >
+                    Disconnect
+                  </button>
+                )}
+              </div>
+
+              {form.hhVacancyId && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                  <div>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Active Polling Status</span>
+                    <p className="text-xs text-muted">When disabled, automatic background syncing is paused.</p>
+                  </div>
+                  <label className="toggle-wrapper" style={{ flexShrink: 0 }}>
+                    <label className="toggle">
+                      <input
+                        type="checkbox"
+                        checked={form.hhSyncEnabled ?? true}
+                        onChange={e => update('hhSyncEnabled', e.target.checked)}
+                      />
+                      <span className="toggle-track" />
+                      <span className="toggle-thumb" />
+                    </label>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="divider" />
+
 
         {/* Candidate link toggle */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>

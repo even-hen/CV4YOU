@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Search, X, Plus, ExternalLink, Unlink, Link2,
-  Users, Eye, Copy, Pencil, Archive, RotateCcw,
+  Users, Pencil, Archive, RotateCcw,
   ChevronDown, ArrowUpDown, Briefcase, Check
 } from 'lucide-react'
 
@@ -144,16 +144,6 @@ export default function VacanciesPage() {
     }
   }
 
-  async function toggleLink(v: Vacancy) {
-    setActionLoading(v.id + '_link')
-    await fetch(`/api/vacancies/${v.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ linkEnabled: !v.linkEnabled }),
-    })
-    setActionLoading(null)
-    fetchVacancies()
-  }
 
   const SORT_LABELS: Record<SortKey, string> = {
     recent: 'Newest first',

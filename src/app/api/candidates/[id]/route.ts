@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { generateStructuredCV } from '@/lib/openrouter'
 
 import { CandidatePatchSchema } from '@/lib/validation'
 

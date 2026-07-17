@@ -12,7 +12,7 @@ function slugify(text: string) {
     .replace(/-+$/, '')
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const vacancies = await prisma.vacancy.findMany({
       where: {

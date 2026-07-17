@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import VacancyForm, { type VacancyFormData } from '@/components/VacancyForm'
-import { Loader2 } from 'lucide-react'
 
 export default function EditVacancyPage() {
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
   const [formData, setFormData] = useState<VacancyFormData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

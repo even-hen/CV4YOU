@@ -22,6 +22,9 @@ export const VacancyCreateSchema = z.object({
   })).default([]),
   linkEnabled: z.boolean().default(true),
   isActive: z.boolean().default(true),
+  hhVacancyId: z.string().nullable().optional(),
+  hhVacancyTitle: z.string().nullable().optional(),
+  hhSyncEnabled: z.boolean().optional(),
 })
 
 export const ApplySchema = z.object({

@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   Bell, ChevronDown, Sun, Moon, User, CreditCard,
-  BellOff, LogOut, Briefcase, X, AlertTriangle, Clock
+  BellOff, LogOut, Briefcase
 } from 'lucide-react'
 import './dashboard.css'
 
