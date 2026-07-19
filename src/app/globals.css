@@ -1710,7 +1710,7 @@ select {
 
 .job-page-shell {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: var(--color-surface-2);
   display: flex;
   flex-direction: column;
   align-items: center;
