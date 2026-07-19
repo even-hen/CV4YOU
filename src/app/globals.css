@@ -95,7 +95,7 @@
 
 /* ── Design Tokens — HeadHunter ────────────────────────────── */
 [data-theme="hh"] {
-  --color-bg: #f4f6fa;
+  --color-bg: #ffffff;
   --color-surface: #ffffff;
   --color-surface-2: #e9ecf4;
   --color-surface-3: #dae0f0;
@@ -115,14 +115,14 @@
   --color-success-dim: rgba(0, 204, 122, 0.08);
   --color-warning: #ff9e00;
   --color-warning-dim: rgba(255, 158, 0, 0.08);
-  --color-danger: #e1011c;
+  --color-danger: #ff0000;
   --color-danger-dim: rgba(225, 1, 28, 0.08);
   --color-info: #0070f0;
   --color-info-dim: rgba(0, 112, 240, 0.08);
 
   --color-score-high: #00cc7a;
   --color-score-mid: #ff9e00;
-  --color-score-low: #e1011c;
+  --color-score-low: #ff0000;
   --color-score-ko: #9099b5;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -795,7 +795,7 @@ select {
 }
 
 [data-theme="hh"] .navbar-logo {
-  color: #e1011c;
+  color: #ff0000;
 }
 
 [data-theme="hh"] .navbar-title {
