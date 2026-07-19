@@ -109,11 +109,22 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
     window.dispatchEvent(new CustomEvent('cv4you-refresh-notif-count'))
   }
 
-  function toggleTheme() {
-    const next = currentTheme === 'dark' ? 'light' : 'dark'
+  async function handleThemeChange(next: string) {
     document.documentElement.setAttribute('data-theme', next)
     localStorage.setItem('cv4you-theme', next)
     setCurrentTheme(next)
+
+    if (session?.user) {
+      try {
+        await fetch('/api/user/theme', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ theme: next })
+        })
+      } catch (err) {
+        console.error('Failed to sync theme to backend', err)
+      }
+    }
   }
 
   async function handleSignOut() {
@@ -245,12 +256,36 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
               <div className="user-menu-divider" />
 
-              <div className="theme-toggle-row">
-                {currentTheme === 'dark' ? <Moon size={15} /> : <Sun size={15} />}
-                <span>{currentTheme === 'dark' ? 'Dark mode' : 'Light mode'}</span>
-                <button className="theme-switch" onClick={toggleTheme} aria-label="Toggle theme">
-                  <span className={`theme-switch-thumb ${currentTheme === 'light' ? 'light' : ''}`} />
-                </button>
+              <div className="theme-toggle-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-muted)' }}>Theme</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text)' }}>
+                    {currentTheme === 'hh' ? 'HH.ru' : currentTheme === 'dark' ? 'Dark' : 'Light'}
+                  </span>
+                </div>
+                <div className="theme-segmented-control">
+                  <button 
+                    type="button"
+                    className={`theme-segment-btn ${currentTheme === 'light' ? 'active' : ''}`} 
+                    onClick={() => handleThemeChange('light')}
+                  >
+                    Light
+                  </button>
+                  <button 
+                    type="button"
+                    className={`theme-segment-btn ${currentTheme === 'dark' ? 'active' : ''}`} 
+                    onClick={() => handleThemeChange('dark')}
+                  >
+                    Dark
+                  </button>
+                  <button 
+                    type="button"
+                    className={`theme-segment-btn ${currentTheme === 'hh' ? 'active' : ''}`} 
+                    onClick={() => handleThemeChange('hh')}
+                  >
+                    HH
+                  </button>
+                </div>
               </div>
 
               <div className="user-menu-divider" />

@@ -53,5 +53,5 @@ export const SettingsSchema = z.object({
 })
 
 export const ThemeSchema = z.object({
-  theme: z.enum(['dark', 'light']),
+  theme: z.enum(['dark', 'light', 'hh']),
 })

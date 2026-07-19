@@ -93,6 +93,44 @@
   --shadow-glow: 0 0 24px var(--color-primary-glow);
 }
 
+/* ── Design Tokens — HeadHunter ────────────────────────────── */
+[data-theme="hh"] {
+  --color-bg: #f4f6fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #e9ecf4;
+  --color-surface-3: #dae0f0;
+  --color-border: #ccd3e6;
+  --color-border-subtle: #e6ebf5;
+
+  --color-text: #222222;
+  --color-text-muted: #5a6380;
+  --color-text-subtle: #6c7693;
+
+  --color-primary: #e1011c;
+  --color-primary-hover: #c00016;
+  --color-primary-dim: rgba(225, 1, 28, 0.08);
+  --color-primary-glow: rgba(225, 1, 28, 0.15);
+
+  --color-success: #00cc7a;
+  --color-success-dim: rgba(0, 204, 122, 0.08);
+  --color-warning: #ff9e00;
+  --color-warning-dim: rgba(255, 158, 0, 0.08);
+  --color-danger: #e1011c;
+  --color-danger-dim: rgba(225, 1, 28, 0.08);
+  --color-info: #0070f0;
+  --color-info-dim: rgba(0, 112, 240, 0.08);
+
+  --color-score-high: #00cc7a;
+  --color-score-mid: #ff9e00;
+  --color-score-low: #e1011c;
+  --color-score-ko: #9099b5;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 24px var(--color-primary-glow);
+}
+
 /* ── Reset & Base ──────────────────────────────────────────── */
 *,
 *::before,
@@ -713,6 +751,76 @@ select {
   padding: 10px 16px;
   font-size: 0.875rem;
   color: var(--color-text);
+}
+
+/* ── Theme Segmented Control ───────────────────────────────── */
+.theme-segmented-control {
+  display: flex;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 2px;
+  width: 100%;
+}
+
+.theme-segment-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-radius: calc(var(--radius-md) - 2px);
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: center;
+}
+
+.theme-segment-btn:hover {
+  color: var(--color-text);
+}
+
+.theme-segment-btn.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── HeadHunter Theme Header Overrides ─────────────────────── */
+[data-theme="hh"] .navbar {
+  background: #171717;
+  border-bottom: 1px solid #2d2d2d;
+}
+
+[data-theme="hh"] .navbar-logo {
+  color: #e1011c;
+}
+
+[data-theme="hh"] .navbar-title {
+  color: #8c8c8c;
+}
+
+[data-theme="hh"] .user-menu-btn {
+  background: #2d2d2d;
+  border-color: #3d3d3d;
+  color: #e8ecf4;
+}
+
+[data-theme="hh"] .user-menu-btn:hover {
+  background: #3d3d3d;
+  border-color: #e1011c;
+  color: #ffffff;
+}
+
+[data-theme="hh"] .notif-btn {
+  color: #8c8c8c;
+}
+
+[data-theme="hh"] .notif-btn:hover {
+  background: #2d2d2d;
+  color: #ffffff;
 }
 
 /* ── Control Bar ───────────────────────────────────────────── */
@@ -1396,6 +1504,19 @@ select {
   --color-success-dim: rgba(22, 163, 74, 0.1);
   --color-danger: #dc2626;
   --color-danger-dim: rgba(220, 38, 38, 0.1);
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-text-subtle: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="hh"] {
+  --color-warning: #d97706;
+  --color-warning-dim: rgba(217, 119, 6, 0.1);
+  --color-info: #2563eb;
+  --color-info-dim: rgba(37, 99, 235, 0.1);
+  --color-success: #16a34a;
+  --color-success-dim: rgba(22, 163, 74, 0.1);
+  --color-danger: #e1011c;
+  --color-danger-dim: rgba(225, 1, 28, 0.08);
   --color-border-subtle: rgba(0, 0, 0, 0.05);
   --color-text-subtle: rgba(0, 0, 0, 0.3);
 }

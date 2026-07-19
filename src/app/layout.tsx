@@ -17,6 +17,16 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const saved = localStorage.getItem('cv4you-theme') || 'light';
+                document.documentElement.setAttribute('data-theme', saved);
+              } catch (_) {}
+            `,
+          }}
+        />
       </head>
       <body><Providers>{children}</Providers></body>
     </html>
