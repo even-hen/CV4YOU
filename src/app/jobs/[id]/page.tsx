@@ -211,8 +211,8 @@ export default function JobPage() {
       <header className="job-header">
         <div className="job-brand">CV4YOU</div>
         <div className="job-title-block">
-          <div className="job-company">{vacancy.company}</div>
           <h1 className="job-role">{vacancy.role}</h1>
+          <div className="job-company">{vacancy.company}</div>
         </div>
       </header>
 
