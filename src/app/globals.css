@@ -1721,7 +1721,7 @@ select {
   width: 100%;
   max-width: 680px;
   padding: 32px 20px 0;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
 }
 
 .job-brand {
