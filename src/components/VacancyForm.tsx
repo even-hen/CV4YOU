@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Plus, Trash2, Loader2, ArrowLeft,
-  Check, Info, Archive, Link2
+  Check, Info, Archive, Link2,
+  HelpCircle, Briefcase, Globe, Copy, AlertTriangle
 } from 'lucide-react'
 
 export interface KOQuestion {
@@ -345,215 +346,234 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           </div>
         </div>
 
-        <div className="divider" />
-
-        {/* Knockout Questions */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="section-title" style={{ marginBottom: 2 }}>Knockout Questions</p>
-              <p className="text-xs text-muted">⚠️ Candidates failing these are automatically rejected. Shown as "Additional Questions" in the candidate form.</p>
+        {/* Knockout Questions Card */}
+        <div className="form-card">
+          <div className="form-card-header">
+            <div className="form-card-title-block">
+              <HelpCircle className="form-card-title-icon" size={20} />
+              <h3 className="form-card-title">Knockout Questions</h3>
             </div>
-            <button type="button" className="btn btn-secondary btn-sm" onClick={addKO} style={{ flexShrink: 0 }}>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={addKO} style={{ gap: 6 }}>
               <Plus size={14} /> Add question
             </button>
           </div>
 
-          {form.knockoutQuestions.length === 0 && (
-            <div className="callout callout-info">
-              <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-              No knockout questions set. Add multiple-choice questions where candidates must answer correctly to proceed.
+          <div className="form-card-body">
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: 'var(--color-warning-dim)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-warning)' }}>
+              <AlertTriangle size={15} style={{ color: 'var(--color-warning)', flexShrink: 0, marginTop: 3 }} />
+              <p className="text-xs text-muted" style={{ margin: 0 }}>
+                Candidates failing these questions are automatically filtered out. They are presented as "Additional Questions" on the candidate submission form.
+              </p>
             </div>
-          )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {form.knockoutQuestions.map((q, qi) => (
-              <div key={qi} className="ko-question-item">
-                <div className="flex items-center justify-between gap-2">
-                  <label className="form-label" style={{ margin: 0 }}>Question {qi + 1}</label>
-                  <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-danger)' }} onClick={() => removeKO(qi)}>
-                    <Trash2 size={14} />
-                  </button>
+            {form.knockoutQuestions.length === 0 ? (
+              <div className="empty-state-dashed">
+                <HelpCircle size={32} style={{ color: 'var(--color-text-subtle)', opacity: 0.6 }} />
+                <div>
+                  <p style={{ fontWeight: 600, fontSize: '0.9375rem', marginBottom: 2 }}>No knockout questions configured</p>
+                  <p className="text-xs text-muted">Add multiple-choice questions to automatically filter unqualified candidates.</p>
                 </div>
-
-                <input
-                  className="form-input"
-                  placeholder="e.g. Do you have experience with React?"
-                  value={q.question}
-                  onChange={e => updateKO(qi, { question: e.target.value })}
-                />
-
-                <div className="ko-options-list">
-                  <p className="text-xs text-muted" style={{ marginBottom: 4 }}>Answer options (select the correct one):</p>
-                  {q.options.map((opt, oi) => (
-                    <div key={oi} className="ko-option-row">
-                      <input
-                        type="radio"
-                        name={`correct-${qi}`}
-                        checked={Number(q.correctAnswer) === oi}
-                        onChange={() => updateKO(qi, { correctAnswer: oi })}
-                        title="Mark as correct answer"
-                        style={{ accentColor: 'var(--color-success)', flexShrink: 0 }}
-                      />
-                      <input
-                        className="form-input ko-option-input"
-                        placeholder={`Option ${oi + 1}`}
-                        value={opt}
-                        onChange={e => updateOption(qi, oi, e.target.value)}
-                      />
-                      {q.options.length > 2 && (
-                        <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-danger)', padding: 4 }} onClick={() => removeOption(qi, oi)}>
-                          <Trash2 size={13} />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start', fontSize: '0.8125rem' }} onClick={() => addOption(qi)}>
-                    <Plus size={13} /> Add option
-                  </button>
-                </div>
+                <button type="button" className="btn btn-secondary btn-xs" onClick={addKO}>
+                  + Create First Question
+                </button>
               </div>
-            ))}
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {form.knockoutQuestions.map((q, qi) => (
+                  <div key={qi} className="ko-question-item">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="form-label" style={{ margin: 0 }}>Question {qi + 1}</label>
+                      <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-danger)' }} onClick={() => removeKO(qi)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+
+                    <input
+                      className="form-input"
+                      placeholder="e.g. Do you have experience with React?"
+                      value={q.question}
+                      onChange={e => updateKO(qi, { question: e.target.value })}
+                    />
+
+                    <div className="ko-options-list">
+                      <p className="text-xs text-muted" style={{ marginBottom: 4 }}>Answer options (select the correct one):</p>
+                      {q.options.map((opt, oi) => (
+                        <div key={oi} className="ko-option-row">
+                          <input
+                            type="radio"
+                            name={`correct-${qi}`}
+                            checked={Number(q.correctAnswer) === oi}
+                            onChange={() => updateKO(qi, { correctAnswer: oi })}
+                            title="Mark as correct answer"
+                            style={{ accentColor: 'var(--color-success)', flexShrink: 0 }}
+                          />
+                          <input
+                            className="form-input ko-option-input"
+                            placeholder={`Option ${oi + 1}`}
+                            value={opt}
+                            onChange={e => updateOption(qi, oi, e.target.value)}
+                          />
+                          {q.options.length > 2 && (
+                            <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-danger)', padding: 4 }} onClick={() => removeOption(qi, oi)}>
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start', fontSize: '0.8125rem' }} onClick={() => addOption(qi)}>
+                        <Plus size={13} /> Add option
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* HeadHunter Linkage */}
+        {/* HeadHunter Integration Card */}
         {!loadingHh && hhConnected && (
-          <div>
-            <div className="divider" />
-            <p className="section-title" style={{ marginBottom: 2 }}>HeadHunter Integration</p>
-            <p className="text-xs text-muted" style={{ marginBottom: 12 }}>
-              Connect this vacancy to an active vacancy on hh.ru to automatically import and score applicants.
-            </p>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 480 }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <select
-                  className="form-input"
-                  style={{ flex: 1, cursor: 'pointer' }}
-                  value={form.hhVacancyId || ''}
-                  onChange={e => {
-                    const selectedId = e.target.value
-                    const v = hhVacancies.find(x => x.id === selectedId)
-                    update('hhVacancyId', selectedId || null)
-                    update('hhVacancyTitle', v ? v.name : null)
-                    // Reset sync flag to enabled when a new vacancy is linked
-                    if (selectedId) update('hhSyncEnabled', true)
-                  }}
-                >
-                  <option value="">-- Select hh.ru Vacancy --</option>
-                  {hhVacancies.map(v => (
-                    <option key={v.id} value={v.id}>{v.name} (ID: {v.id})</option>
-                  ))}
-                </select>
+          <div className="form-card">
+            <div className="form-card-header">
+              <div className="form-card-title-block">
+                <Briefcase className="form-card-title-icon" size={20} />
+                <h3 className="form-card-title">HeadHunter Integration</h3>
+              </div>
+              <span style={{ background: 'var(--color-success-dim)', color: 'var(--color-success)', fontSize: '0.75rem', fontWeight: 600, padding: '4px 8px', borderRadius: 'var(--radius-sm)' }}>
+                Connected
+              </span>
+            </div>
+
+            <div className="form-card-body">
+              <p className="text-xs text-muted" style={{ margin: 0 }}>
+                Link this vacancy to an active posting on hh.ru. CV4YOU will automatically fetch, process, and score incoming applicants.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div className="select-wrapper">
+                    <select
+                      className="form-input"
+                      style={{ cursor: 'pointer', width: '100%' }}
+                      value={form.hhVacancyId || ''}
+                      onChange={e => {
+                        const selectedId = e.target.value
+                        const v = hhVacancies.find(x => x.id === selectedId)
+                        update('hhVacancyId', selectedId || null)
+                        update('hhVacancyTitle', v ? v.name : null)
+                        if (selectedId) update('hhSyncEnabled', true)
+                      }}
+                    >
+                      <option value="">-- Mapped hh.ru Vacancy --</option>
+                      {hhVacancies.map(v => (
+                        <option key={v.id} value={v.id}>{v.name} (ID: {v.id})</option>
+                      ))}
+                    </select>
+                  </div>
+                  {form.hhVacancyId && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                      onClick={() => {
+                        update('hhVacancyId', null)
+                        update('hhVacancyTitle', null)
+                        update('hhSyncEnabled', false)
+                      }}
+                    >
+                      Disconnect Link
+                    </button>
+                  )}
+                </div>
+
                 {form.hhVacancyId && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
-                    onClick={() => {
-                      update('hhVacancyId', null)
-                      update('hhVacancyTitle', null)
-                      update('hhSyncEnabled', false)
-                    }}
-                  >
-                    Disconnect
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', marginTop: 4 }}>
+                    <div>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Sync Active</span>
+                      <p className="text-xs text-muted" style={{ margin: 0 }}>Import candidates automatically in the background</p>
+                    </div>
+                    <label className="toggle-wrapper" style={{ flexShrink: 0 }}>
+                      <label className="toggle">
+                        <input
+                          type="checkbox"
+                          checked={form.hhSyncEnabled ?? true}
+                          onChange={e => update('hhSyncEnabled', e.target.checked)}
+                        />
+                        <span className="toggle-track" />
+                        <span className="toggle-thumb" />
+                      </label>
+                    </label>
+                  </div>
                 )}
               </div>
-
-              {form.hhVacancyId && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                  <div>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Active Polling Status</span>
-                    <p className="text-xs text-muted">When disabled, automatic background syncing is paused.</p>
-                  </div>
-                  <label className="toggle-wrapper" style={{ flexShrink: 0 }}>
-                    <label className="toggle">
-                      <input
-                        type="checkbox"
-                        checked={form.hhSyncEnabled ?? true}
-                        onChange={e => update('hhSyncEnabled', e.target.checked)}
-                      />
-                      <span className="toggle-track" />
-                      <span className="toggle-thumb" />
-                    </label>
-                  </label>
-                </div>
-              )}
             </div>
           </div>
         )}
 
-        <div className="divider" />
-
-
-        {/* Candidate link toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <p className="section-title" style={{ marginBottom: 2 }}>Candidate Application Link</p>
-            <p className="text-xs text-muted">When disabled, candidates cannot submit applications via the public link.</p>
-          </div>
-          <label className="toggle-wrapper" style={{ flexShrink: 0, opacity: form.isActive === false ? 0.5 : 1, cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
-            <label className="toggle" style={{ cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
-              <input type="checkbox" checked={form.linkEnabled} disabled={form.isActive === false} onChange={e => update('linkEnabled', e.target.checked)} />
-              <span className="toggle-track" />
-              <span className="toggle-thumb" />
+        {/* Candidate Application Link Card */}
+        <div className="form-card">
+          <div className="form-card-header">
+            <div className="form-card-title-block">
+              <Globe className="form-card-title-icon" size={20} />
+              <h3 className="form-card-title">Candidate Application Link</h3>
+            </div>
+            <label className="toggle-wrapper" style={{ flexShrink: 0, opacity: form.isActive === false ? 0.5 : 1, cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
+              <label className="toggle" style={{ cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
+                <input type="checkbox" checked={form.linkEnabled} disabled={form.isActive === false} onChange={e => update('linkEnabled', e.target.checked)} />
+                <span className="toggle-track" />
+                <span className="toggle-thumb" />
+              </label>
+              <span style={{ fontSize: '0.875rem', color: form.linkEnabled && form.isActive !== false ? 'var(--color-success)' : 'var(--color-text-muted)', fontWeight: 600 }}>
+                {form.linkEnabled && form.isActive !== false ? 'Link Active' : 'Link Disabled'}
+              </span>
             </label>
-            <span style={{ fontSize: '0.875rem', color: form.linkEnabled ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-              {form.linkEnabled ? 'Link enabled' : 'Link disabled'}
-            </span>
-          </label>
-        </div>
-
-        {/* Link to vacancy display & copy chain icon */}
-        {mode === 'edit' && linkUrl && (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <a
-              href={form.linkEnabled && form.isActive !== false ? linkUrl : undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: form.linkEnabled && form.isActive !== false ? 'var(--color-text-muted)' : 'var(--color-text-subtle)',
-                textDecoration: form.linkEnabled && form.isActive !== false ? 'underline' : 'none',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                fontWeight: 500,
-                fontSize: '0.875rem',
-                cursor: form.linkEnabled && form.isActive !== false ? 'pointer' : 'default'
-              }}
-              title={form.linkEnabled && form.isActive !== false ? 'Click to open candidate application page' : 'Link is currently disabled'}
-              onClick={(e) => { if (!form.linkEnabled || form.isActive === false) e.preventDefault(); }}
-            >
-              {linkUrl}
-            </a>
-            <button
-              type="button"
-              onClick={copyLink}
-              disabled={!form.linkEnabled || form.isActive === false}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: '4px 6px',
-                cursor: form.linkEnabled && form.isActive !== false ? 'pointer' : 'not-allowed',
-                color: copiedLink ? 'var(--color-success)' : (form.linkEnabled && form.isActive !== false ? 'var(--color-primary)' : 'var(--color-text-subtle)'),
-                display: 'inline-flex',
-                alignItems: 'center',
-                borderRadius: 'var(--radius-sm)',
-                transition: 'all var(--transition)',
-                opacity: form.linkEnabled && form.isActive !== false ? 1 : 0.5,
-                flexShrink: 0
-              }}
-              title="Copy candidate link"
-            >
-              {copiedLink ? <Check size={16} /> : <Link2 size={16} />}
-            </button>
-            {copiedLink && <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600 }}>Copied!</span>}
           </div>
-        )}
 
-        <div className="divider" />
+          <div className="form-card-body">
+            <p className="text-xs text-muted" style={{ margin: 0 }}>
+              Allow direct candidate submissions. When enabled, anyone with the public link can upload their CV to apply for this vacancy.
+            </p>
+
+            {mode === 'edit' && linkUrl && (
+              <div className="url-bar-container">
+                <a
+                  href={form.linkEnabled && form.isActive !== false ? linkUrl : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="url-bar-link"
+                  title={form.linkEnabled && form.isActive !== false ? 'Open application page' : 'Link is disabled'}
+                  onClick={(e) => { if (!form.linkEnabled || form.isActive === false) e.preventDefault(); }}
+                >
+                  {linkUrl}
+                </a>
+                <button
+                  type="button"
+                  className={`url-bar-copy-btn ${copiedLink ? 'success' : ''}`}
+                  onClick={copyLink}
+                  disabled={!form.linkEnabled || form.isActive === false}
+                  title="Copy Link to Clipboard"
+                >
+                  {copiedLink ? (
+                    <>
+                      <Check size={14} /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={14} /> Copy Link
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {mode === 'create' && (
+              <div className="callout callout-info" style={{ margin: 0, padding: '10px 14px' }}>
+                <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+                <span className="text-xs">Your public application link will be generated automatically after creating the vacancy.</span>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Submit & Action buttons */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingTop: 8 }}>
