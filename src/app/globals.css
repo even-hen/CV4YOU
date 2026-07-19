@@ -106,10 +106,10 @@
   --color-text-muted: #5a6380;
   --color-text-subtle: #6c7693;
 
-  --color-primary: #e1011c;
-  --color-primary-hover: #c00016;
-  --color-primary-dim: rgba(225, 1, 28, 0.08);
-  --color-primary-glow: rgba(225, 1, 28, 0.15);
+  --color-primary: #4a6af0;
+  --color-primary-hover: #3a56e0;
+  --color-primary-dim: rgba(74, 106, 240, 0.1);
+  --color-primary-glow: rgba(74, 106, 240, 0.2);
 
   --color-success: #00cc7a;
   --color-success-dim: rgba(0, 204, 122, 0.08);
@@ -2877,9 +2877,12 @@ select {
 
 /* ── Skeleton loader utility ──────────────────────────────────── */
 @keyframes skeleton-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.65;
   }
+
   50% {
     opacity: 0.3;
   }
