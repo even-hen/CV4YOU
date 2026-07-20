@@ -608,6 +608,30 @@ select {
   white-space: nowrap;
 }
 
+.user-name-text {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+@media (max-width: 500px) {
+  .user-name-text {
+    max-width: 65px;
+  }
+  .user-menu-btn {
+    padding: 6px 8px;
+    gap: 4px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .user-name-text {
+    max-width: 50px;
+  }
+}
+
 .user-menu-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);

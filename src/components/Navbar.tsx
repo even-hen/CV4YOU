@@ -211,7 +211,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
         <div className="user-menu-wrapper" ref={menuRef}>
           <button className="user-menu-btn" onClick={() => setMenuOpen(v => !v)} id="user-menu-btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <User size={15} />
-            <span className="truncate" style={{ maxWidth: 120 }}>{user?.name || user?.email || 'Аккаунт'}</span>
+            <span className="user-name-text">{user?.name || user?.email || 'Аккаунт'}</span>
             {user?.subscriptionTier === 'PRO' && (
               <span
                 className="badge-primary"
