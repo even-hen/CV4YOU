@@ -400,6 +400,11 @@
   gap: 8px;
   font-size: 0.875rem;
   color: var(--color-text-muted);
+  flex: 1;
+}
+
+.plan-card .btn {
+  margin-top: auto;
 }
 
 .plan-features li {

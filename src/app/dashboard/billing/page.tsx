@@ -16,7 +16,7 @@ const PLANS = [
     key: 'basic',
     name: 'Базовый (Бесплатно)',
     limit: '10 активных вакансий',
-    features: ['До 10 активных вакансий', 'ИИ-подбор и оценка резюме', 'Управление кандидатами', 'Email-уведомления', 'Генерация резюме по запросу'],
+    features: ['До 10 активных вакансий', 'Интеграция c hh.ru', 'ИИ-подбор и оценка резюме', 'Email-уведомления (временно не работает)', 'Генерация резюме по запросу'],
     prices: { '1m': 0, '1y': 0 },
     recommended: false,
   },
@@ -26,13 +26,12 @@ const PLANS = [
     limit: '30 активных вакансий',
     features: [
       'До 30 активных вакансий',
+      'Интеграция c hh.ru',
       'ИИ-подбор и оценка резюме',
-      'Управление кандидатами',
-      'Email-уведомления',
+      'Email-уведомления (временно не работает)',
       'Генерация резюме по запросу',
       'Приоритетная поддержка',
       'Экспорт кандидатов в CSV (Pro)',
-      'Ссылка на кандидата (Pro)',
       'Автоответы кандидатам (Pro)',
       'Кастомный брендинг (Pro)',
     ],
@@ -94,9 +93,9 @@ function BillingContent() {
       )}
 
       {/* Duration selector */}
-      <div className="mb-6">
-        <p className="section-title mb-3">Период оплаты</p>
-        <div className="duration-tabs" style={{ maxWidth: 360 }}>
+      <div className="mb-6" style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <p className="section-title" style={{ margin: 0 }}>Период оплаты</p>
+        <div className="duration-tabs" style={{ maxWidth: 280, flex: '1 1 200px' }}>
           {DURATIONS.map(d => (
             <button
               key={d.key}
