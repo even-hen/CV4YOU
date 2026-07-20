@@ -50,15 +50,15 @@ const EMPTY_FORM: VacancyFormData = {
 
 
 const CONTACT_OPTIONS = [
-  { key: 'phone', label: 'Phone number' },
+  { key: 'phone', label: 'Номер телефона' },
   { key: 'telegram', label: 'Telegram' },
-  { key: 'email', label: 'Email address' },
+  { key: 'email', label: 'Электронная почта' },
 ]
 
 const SALARY_OPTIONS = [
-  { value: '', label: 'Not asked' },
-  { value: 'optional', label: 'Optional' },
-  { value: 'required', label: 'Required' },
+  { value: '', label: 'Не запрашивать' },
+  { value: 'optional', label: 'Необязательно' },
+  { value: 'required', label: 'Обязательно' },
 ]
 
 interface VacancyFormProps {
@@ -185,9 +185,9 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
     // Validate KO questions
     for (const q of form.knockoutQuestions) {
-      if (!q.question.trim()) { setError('All knockout questions must have a question text.'); setSaving(false); return }
-      if (q.options.filter(o => o.trim()).length < 2) { setError('Each question must have at least 2 options.'); setSaving(false); return }
-      if (q.correctAnswer === undefined || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) { setError('Each question must have a correct answer selected.'); setSaving(false); return }
+      if (!q.question.trim()) { setError('Все отсеивающие вопросы должны содержать текст вопроса.'); setSaving(false); return }
+      if (q.options.filter(o => o.trim()).length < 2) { setError('Каждый вопрос должен иметь как минимум 2 варианта ответа.'); setSaving(false); return }
+      if (q.correctAnswer === undefined || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) { setError('Для каждого вопроса должен быть выбран правильный ответ.'); setSaving(false); return }
     }
 
     try {
@@ -218,9 +218,9 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
       if (!res.ok) {
         if (data.limitReached) {
-          setError(`You've reached your active vacancy limit. Upgrade to Pro for up to 30 vacancies.`)
+          setError(`Вы достигли лимита активных вакансий. Перейдите на тариф Pro, чтобы создавать до 30 вакансий.`)
         } else {
-          setError(data.error || 'Failed to save vacancy.')
+          setError(data.error || 'Не удалось сохранить вакансию.')
         }
         setSaving(false)
         return
@@ -228,7 +228,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
       router.push('/dashboard/vacancies')
     } catch {
-      setError('Network error. Please try again.')
+      setError('Сетевая ошибка. Пожалуйста, попробуйте еще раз.')
       setSaving(false)
     }
   }
@@ -246,10 +246,10 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
     <div>
       <div className="flex items-center gap-3 mb-6" style={{ flexWrap: 'wrap' }}>
         <button className="btn btn-ghost btn-sm" onClick={() => router.back()} style={{ gap: 5 }}>
-          <ArrowLeft size={15} /> Back
+          <ArrowLeft size={15} /> Назад
         </button>
         <h1 style={{ fontSize: '1.375rem', fontWeight: 800 }}>
-          {mode === 'create' ? 'New Vacancy' : 'Edit Vacancy'}
+          {mode === 'create' ? 'Новая вакансия' : 'Редактирование вакансии'}
         </h1>
       </div>
 
@@ -260,22 +260,22 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
         {/* Basic Info */}
         <div className="form-row-2">
           <div className="form-group">
-            <label className="form-label">Company *</label>
-            <input className="form-input" placeholder="e.g. Acme Corp" value={form.company}
+            <label className="form-label">Компания *</label>
+            <input className="form-input" placeholder="например, Acme Corp" value={form.company}
               onChange={e => update('company', e.target.value)} required />
           </div>
           <div className="form-group">
-            <label className="form-label">Role / Job Title *</label>
-            <input className="form-input" placeholder="e.g. Senior Frontend Developer" value={form.role}
+            <label className="form-label">Роль / Должность *</label>
+            <input className="form-input" placeholder="например, Senior Frontend Developer" value={form.role}
               onChange={e => update('role', e.target.value)} required />
           </div>
         </div>
 
         {/* Responsibilities */}
         <div className="form-group">
-          <label className="form-label">Responsibilities</label>
+          <label className="form-label">Обязанности</label>
           <textarea className="form-textarea" style={{ minHeight: 150 }}
-            placeholder="Describe what the candidate will be doing…"
+            placeholder="Опишите обязанности кандидата…"
             value={form.responsibilities}
             onChange={e => update('responsibilities', e.target.value)}
           />
@@ -284,11 +284,10 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
         {/* Base Requirements */}
         <div className="form-group">
           <label className="form-label">
-            Base Requirements *
-            <span className="form-label-hint"> — standard evaluation</span>
+            Базовые требования *
           </label>
           <textarea className="form-textarea" style={{ width: '100%', minHeight: 150 }}
-            placeholder="Skills and experience expected from most candidates…"
+            placeholder="Навыки и опыт, ожидаемые от большинства кандидатов…"
             value={form.baseRequirements}
             onChange={e => update('baseRequirements', e.target.value)}
             required
@@ -299,19 +298,18 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
         <div className="form-row-2">
           <div className="form-group">
             <label className="form-label">
-              Mandatory Requirements
-              <span className="form-label-hint"> — highest evaluation (optional)</span>
+              Обязательные требования
             </label>
             <textarea className="form-textarea" style={{ width: '100%', minHeight: 150 }}
-              placeholder="Must-have skills. Missing these heavily lowers score…"
+              placeholder="Ключевые навыки. Отсутствие этих навыков сильно снижает оценку…"
               value={form.mandatoryRequirements}
               onChange={e => update('mandatoryRequirements', e.target.value)}
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Nice to Have</label>
+            <label className="form-label">Желательные требования</label>
             <textarea className="form-textarea" style={{ width: '100%', minHeight: 150 }}
-              placeholder="Bonus skills or experience (optional)…"
+              placeholder="Дополнительные навыки или опыт (необязательно)…"
               value={form.niceToHave}
               onChange={e => update('niceToHave', e.target.value)}
             />
@@ -322,7 +320,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
         {/* Salary expectation — on top of Contacts */}
         <div className="form-group">
-          <label className="form-label">Salary Expectation</label>
+          <label className="form-label">Ожидания по зарплате</label>
           <div style={{ display: 'flex', gap: 10 }}>
             {SALARY_OPTIONS.map(o => (
               <label key={o.value} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 14px', background: form.salaryExpectation === o.value ? 'var(--color-primary-dim)' : 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.salaryExpectation === o.value ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)', fontSize: '0.875rem' }}>
@@ -335,7 +333,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
         {/* Contact fields */}
         <div>
-          <p className="form-label" style={{ marginBottom: 10 }}>Request Contact Information</p>
+          <p className="form-label" style={{ marginBottom: 10 }}>Запрашивать контактную информацию</p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             {CONTACT_OPTIONS.map(c => (
               <label key={c.key} className="checkbox-group" style={{ padding: '8px 14px', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: `1px solid ${form.requestedContacts.includes(c.key) ? 'var(--color-primary)' : 'var(--color-border)'}`, cursor: 'pointer', transition: 'all var(--transition)' }}>
@@ -351,18 +349,15 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <div className="form-card-header">
             <div className="form-card-title-block">
               <HelpCircle className="form-card-title-icon" size={20} />
-              <h3 className="form-card-title">Knockout Questions</h3>
+              <h3 className="form-card-title">Отсеивающие вопросы</h3>
             </div>
-            <button type="button" className="btn btn-secondary btn-sm" onClick={addKO} style={{ gap: 6 }}>
-              <Plus size={14} /> Add question
-            </button>
           </div>
 
           <div className="form-card-body">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: 'var(--color-warning-dim)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', borderLeft: '3px solid var(--color-warning)' }}>
               <AlertTriangle size={15} style={{ color: 'var(--color-warning)', flexShrink: 0, marginTop: 3 }} />
               <p className="text-xs text-muted" style={{ margin: 0 }}>
-                Candidates failing these questions are automatically filtered out. They are presented as "Additional Questions" on the candidate submission form.
+                Кандидаты, не ответившие правильно на эти вопросы, автоматически отсеиваются. Вопросы отображаются как «Дополнительные вопросы» в форме отправки резюме.
               </p>
             </div>
 
@@ -370,11 +365,11 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
               <div className="empty-state-dashed">
                 <HelpCircle size={32} style={{ color: 'var(--color-text-subtle)', opacity: 0.6 }} />
                 <div>
-                  <p style={{ fontWeight: 600, fontSize: '0.9375rem', marginBottom: 2 }}>No knockout questions configured</p>
-                  <p className="text-xs text-muted">Add multiple-choice questions to automatically filter unqualified candidates.</p>
+                  <p style={{ fontWeight: 600, fontSize: '0.9375rem', marginBottom: 2 }}>Отсеивающие вопросы не настроены</p>
+                  <p className="text-xs text-muted">Добавьте вопросы с вариантами ответов, чтобы автоматически отсеивать неподходящих кандидатов.</p>
                 </div>
                 <button type="button" className="btn btn-secondary btn-xs" onClick={addKO}>
-                  + Create First Question
+                  + Создать первый вопрос
                 </button>
               </div>
             ) : (
@@ -382,7 +377,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                 {form.knockoutQuestions.map((q, qi) => (
                   <div key={qi} className="ko-question-item">
                     <div className="flex items-center justify-between gap-2">
-                      <label className="form-label" style={{ margin: 0 }}>Question {qi + 1}</label>
+                      <label className="form-label" style={{ margin: 0 }}>Вопрос {qi + 1}</label>
                       <button type="button" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-danger)' }} onClick={() => removeKO(qi)}>
                         <Trash2 size={14} />
                       </button>
@@ -390,13 +385,13 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
 
                     <input
                       className="form-input"
-                      placeholder="e.g. Do you have experience with React?"
+                      placeholder="например, Есть ли у вас опыт работы с React?"
                       value={q.question}
                       onChange={e => updateKO(qi, { question: e.target.value })}
                     />
 
                     <div className="ko-options-list">
-                      <p className="text-xs text-muted" style={{ marginBottom: 4 }}>Answer options (select the correct one):</p>
+                      <p className="text-xs text-muted" style={{ marginBottom: 4 }}>Варианты ответов (отметьте правильный):</p>
                       {q.options.map((opt, oi) => (
                         <div key={oi} className="ko-option-row">
                           <input
@@ -404,12 +399,12 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                             name={`correct-${qi}`}
                             checked={Number(q.correctAnswer) === oi}
                             onChange={() => updateKO(qi, { correctAnswer: oi })}
-                            title="Mark as correct answer"
+                            title="Отметить как правильный ответ"
                             style={{ accentColor: 'var(--color-success)', flexShrink: 0 }}
                           />
                           <input
                             className="form-input ko-option-input"
-                            placeholder={`Option ${oi + 1}`}
+                            placeholder={`Вариант ${oi + 1}`}
                             value={opt}
                             onChange={e => updateOption(qi, oi, e.target.value)}
                           />
@@ -421,11 +416,14 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                         </div>
                       ))}
                       <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start', fontSize: '0.8125rem' }} onClick={() => addOption(qi)}>
-                        <Plus size={13} /> Add option
+                        <Plus size={13} /> Добавить вариант
                       </button>
                     </div>
                   </div>
                 ))}
+                <button type="button" className="btn btn-secondary btn-sm" onClick={addKO} style={{ gap: 6, alignSelf: 'flex-end', marginTop: 4 }}>
+                  <Plus size={14} /> Добавить вопрос
+                </button>
               </div>
             )}
           </div>
@@ -437,16 +435,16 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
             <div className="form-card-header">
               <div className="form-card-title-block">
                 <Briefcase className="form-card-title-icon" size={20} />
-                <h3 className="form-card-title">HeadHunter Integration</h3>
+                <h3 className="form-card-title">Интеграция с HeadHunter</h3>
               </div>
               <span style={{ background: 'var(--color-success-dim)', color: 'var(--color-success)', fontSize: '0.75rem', fontWeight: 600, padding: '4px 8px', borderRadius: 'var(--radius-sm)' }}>
-                Connected
+                Подключено
               </span>
             </div>
 
             <div className="form-card-body">
               <p className="text-xs text-muted" style={{ margin: 0 }}>
-                Link this vacancy to an active posting on hh.ru. CV4YOU will automatically fetch, process, and score incoming applicants.
+                Свяжите эту вакансию с активным объявлением на hh.ru. CV4YOU будет автоматически загружать, обрабатывать и оценивать отклики кандидатов.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -464,7 +462,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                         if (selectedId) update('hhSyncEnabled', true)
                       }}
                     >
-                      <option value="">-- Mapped hh.ru Vacancy --</option>
+                      <option value="">-- Связанная вакансия hh.ru --</option>
                       {hhVacancies.map(v => (
                         <option key={v.id} value={v.id}>{v.name} (ID: {v.id})</option>
                       ))}
@@ -481,7 +479,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                         update('hhSyncEnabled', false)
                       }}
                     >
-                      Disconnect Link
+                      Отключить связь
                     </button>
                   )}
                 </div>
@@ -489,8 +487,8 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                 {form.hhVacancyId && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', marginTop: 4 }}>
                     <div>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Sync Active</span>
-                      <p className="text-xs text-muted" style={{ margin: 0 }}>Import candidates automatically in the background</p>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Синхронизация активна</span>
+                      <p className="text-xs text-muted" style={{ margin: 0 }}>Автоматический импорт кандидатов в фоновом режиме</p>
                     </div>
                     <label className="toggle-wrapper" style={{ flexShrink: 0 }}>
                       <label className="toggle">
@@ -515,7 +513,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
           <div className="form-card-header">
             <div className="form-card-title-block">
               <Globe className="form-card-title-icon" size={20} />
-              <h3 className="form-card-title">Candidate Application Link</h3>
+              <h3 className="form-card-title">Ссылка для отклика кандидатов</h3>
             </div>
             <label className="toggle-wrapper" style={{ flexShrink: 0, opacity: form.isActive === false ? 0.5 : 1, cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
               <label className="toggle" style={{ cursor: form.isActive === false ? 'not-allowed' : 'pointer' }}>
@@ -524,14 +522,14 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                 <span className="toggle-thumb" />
               </label>
               <span style={{ fontSize: '0.875rem', color: form.linkEnabled && form.isActive !== false ? 'var(--color-success)' : 'var(--color-text-muted)', fontWeight: 600 }}>
-                {form.linkEnabled && form.isActive !== false ? 'Link Active' : 'Link Disabled'}
+                {form.linkEnabled && form.isActive !== false ? 'Ссылка активна' : 'Ссылка отключена'}
               </span>
             </label>
           </div>
 
           <div className="form-card-body">
             <p className="text-xs text-muted" style={{ margin: 0 }}>
-              Allow direct candidate submissions. When enabled, anyone with the public link can upload their CV to apply for this vacancy.
+              Когда ссылка включена, любой человек может загрузить свое резюме для отклика на эту вакансию.
             </p>
 
             {mode === 'edit' && linkUrl && (
@@ -541,7 +539,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                   target="_blank"
                   rel="noopener noreferrer"
                   className="url-bar-link"
-                  title={form.linkEnabled && form.isActive !== false ? 'Open application page' : 'Link is disabled'}
+                  title={form.linkEnabled && form.isActive !== false ? 'Открыть страницу отклика' : 'Ссылка отключена'}
                   onClick={(e) => { if (!form.linkEnabled || form.isActive === false) e.preventDefault(); }}
                 >
                   {linkUrl}
@@ -551,15 +549,15 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
                   className={`url-bar-copy-btn ${copiedLink ? 'success' : ''}`}
                   onClick={copyLink}
                   disabled={!form.linkEnabled || form.isActive === false}
-                  title="Copy Link to Clipboard"
+                  title="Скопировать ссылку"
                 >
                   {copiedLink ? (
                     <>
-                      <Check size={14} /> Copied!
+                      <Check size={14} /> Скопировано!
                     </>
                   ) : (
                     <>
-                      <Copy size={14} /> Copy Link
+                      <Copy size={14} /> Копировать ссылку
                     </>
                   )}
                 </button>
@@ -569,7 +567,7 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
             {mode === 'create' && (
               <div className="callout callout-info" style={{ margin: 0, padding: '10px 14px' }}>
                 <Info size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-                <span className="text-xs">Your public application link will be generated automatically after creating the vacancy.</span>
+                <span className="text-xs">Ваша публичная ссылка для отклика будет сгенерирована автоматически после создания вакансии.</span>
               </div>
             )}
           </div>
@@ -589,19 +587,19 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
             onClick={() => setConfirmArchive(true)}
             title={
               mode === 'create'
-                ? 'Cannot archive new vacancy'
+                ? 'Невозможно архивировать новую вакансию'
                 : form.isActive === false
-                  ? 'Vacancy is already archived'
-                  : 'Archive vacancy'
+                  ? 'Вакансия уже архивирована'
+                  : 'Архивировать вакансию'
             }
           >
-            {archiving ? <><Loader2 size={15} className="spin" /> Archiving…</> : <><Archive size={15} /> Archive</>}
+            {archiving ? <><Loader2 size={15} className="spin" /> Архивация…</> : <><Archive size={15} /> В архив</>}
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Cancel</button>
+            <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Отмена</button>
             <button type="submit" className="btn btn-primary" disabled={saving || archiving}>
-              {saving ? <><Loader2 size={15} className="spin" /> Saving…</> : mode === 'create' ? 'Create Vacancy' : 'Save'}
+              {saving ? <><Loader2 size={15} className="spin" /> Сохранение…</> : mode === 'create' ? 'Создать вакансию' : 'Сохранить'}
             </button>
           </div>
         </div>
@@ -611,18 +609,18 @@ export default function VacancyForm({ initialData, vacancyId, mode }: VacancyFor
       {confirmArchive && (
         <div className="modal-overlay" onClick={() => setConfirmArchive(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">Archive vacancy?</h2>
+            <h2 className="modal-title">Архивировать вакансию?</h2>
             <p className="modal-body">
-              This vacancy will be moved to Archived. Candidates will no longer be able to submit applications. Existing applications are preserved.
+              Эта вакансия будет перенесена в архив. Кандидаты больше не смогут отправлять отклики. Существующие отклики сохраняются.
             </p>
             <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmArchive(false)}>Cancel</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmArchive(false)}>Отмена</button>
               <button
                 className="btn btn-danger"
                 disabled={archiving}
                 onClick={handleArchive}
               >
-                {archiving ? <><Loader2 size={14} className="spin" /> Archiving…</> : <><Archive size={14} /> Archive</>}
+                {archiving ? <><Loader2 size={14} className="spin" /> Архивация…</> : <><Archive size={14} /> В архив</>}
               </button>
             </div>
           </div>

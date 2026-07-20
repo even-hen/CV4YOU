@@ -71,7 +71,7 @@ export async function runScoringPipeline(applicationId: string): Promise<void> {
     await prisma.notification.create({
       data: {
         recruiterId: v.recruiterId,
-        message: `New application from ${app.candidateName} for ${v.role} at ${v.company}`,
+        message: `Новый отклик от ${app.candidateName} на ${v.role} в ${v.company}`,
         link: `/dashboard/vacancies/${app.vacancyId}/candidates`,
       },
     })

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Bell, ChevronDown, Sun, Moon, User, CreditCard,
-  BellOff, LogOut, Briefcase
+  BellOff, LogOut, Briefcase, HelpCircle
 } from 'lucide-react'
 import './dashboard.css'
 
@@ -29,6 +29,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -37,21 +38,15 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
   const menuRef = useRef<HTMLDivElement>(null)
   const bellRef = useRef<HTMLDivElement>(null)
+  const helpRef = useRef<HTMLDivElement>(null)
   const user = session?.user
-  const [currentTheme, setCurrentTheme] = useState<string>('light')
-
-  // Initialize theme from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('cv4you-theme') || 'light'
-    document.documentElement.setAttribute('data-theme', saved)
-    setCurrentTheme(saved)
-  }, [])
 
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
       if (bellRef.current && !bellRef.current.contains(e.target as Node)) setBellOpen(false)
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) setHelpOpen(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -109,24 +104,6 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
     window.dispatchEvent(new CustomEvent('cv4you-refresh-notif-count'))
   }
 
-  async function handleThemeChange(next: string) {
-    document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('cv4you-theme', next)
-    setCurrentTheme(next)
-
-    if (session?.user) {
-      try {
-        await fetch('/api/user/theme', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ theme: next })
-        })
-      } catch (err) {
-        console.error('Failed to sync theme to backend', err)
-      }
-    }
-  }
-
   async function handleSignOut() {
     await signOut({ redirect: false })
     router.push('/login')
@@ -134,11 +111,45 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
   return (
     <nav className="navbar">
-      <Link href="/dashboard/vacancies" className="navbar-logo">🎯 CV4YOU</Link>
+      <Link href="/dashboard/vacancies" className="navbar-logo">📋 CV4YOU</Link>
 
       {title && <span className="navbar-title">{title}</span>}
 
       <div className="navbar-actions">
+        {/* Help / Feedback Tooltip */}
+        <div className="user-menu-wrapper" ref={helpRef}>
+          <button
+            className="notif-btn"
+            onClick={() => setHelpOpen(v => !v)}
+            aria-label="Вопросы и отзывы"
+          >
+            <HelpCircle size={20} />
+          </button>
+
+          {helpOpen && (
+            <div
+              className="notif-dropdown"
+              style={{
+                width: 280,
+                padding: '14px 16px',
+                fontSize: '0.875rem',
+                lineHeight: '1.4',
+                color: 'var(--color-text)',
+              }}
+            >
+              <p style={{ margin: 0 }}>
+                Вопросы, отзывы и предложения можно отправить на почту{' '}
+                <a
+                  href="mailto:sendit@internet.ru"
+                  style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}
+                >
+                  sendit@internet.ru
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Notification Bell */}
         <div className="user-menu-wrapper" ref={bellRef}>
           <button className="notif-btn" onClick={() => setBellOpen(v => !v)} aria-label="Notifications" id="notif-bell">
@@ -151,9 +162,9 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
           {bellOpen && (
             <div className="notif-dropdown">
               <div className="notif-header">
-                <span className="font-semibold">Notifications</span>
+                <span className="font-semibold">Уведомления</span>
                 {unreadCount > 0 && (
-                  <button className="btn btn-ghost btn-sm" onClick={handleMarkAllRead}>Mark all read</button>
+                  <button className="btn btn-ghost btn-sm" onClick={handleMarkAllRead}>Всё прочитано</button>
                 )}
               </div>
               <div className="notif-list">
@@ -162,7 +173,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
                 ) : notifications.length === 0 ? (
                   <div className="notif-empty">
                     <BellOff size={20} />
-                    <span>You&apos;re all caught up</span>
+                    <span>У вас нет новых уведомлений</span>
                   </div>
                 ) : (
                   <>
@@ -186,7 +197,7 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
                         onClick={loadMore}
                         disabled={loadingMore}
                       >
-                        {loadingMore ? 'Loading...' : 'Show more...'}
+                        {loadingMore ? 'Загрузка...' : 'Показать еще...'}
                       </button>
                     )}
                   </>
@@ -200,20 +211,20 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
         <div className="user-menu-wrapper" ref={menuRef}>
           <button className="user-menu-btn" onClick={() => setMenuOpen(v => !v)} id="user-menu-btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <User size={15} />
-            <span className="truncate" style={{ maxWidth: 120 }}>{user?.name || user?.email || 'Account'}</span>
+            <span className="truncate" style={{ maxWidth: 120 }}>{user?.name || user?.email || 'Аккаунт'}</span>
             {user?.subscriptionTier === 'PRO' && (
-              <span 
-                className="badge-primary" 
-                style={{ 
-                  fontSize: '0.7rem', 
-                  fontWeight: 'bold', 
-                  padding: '1px 5px', 
-                  borderRadius: 4, 
-                  backgroundColor: 'var(--color-primary)', 
+              <span
+                className="badge-primary"
+                style={{
+                  fontSize: '0.7rem',
+                  fontWeight: 'bold',
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  backgroundColor: 'var(--color-primary)',
                   color: 'white',
                   cursor: 'help'
                 }}
-                title="PRO Features:&#10;• Export candidates to CSV&#10;• Share candidate by link&#10;• Auto replies for candidates&#10;• Custom branding"
+                title="PRO-возможности:&#10;• Экспорт кандидатов в CSV&#10;• Ссылка на кандидата&#10;• Автоответы кандидатам&#10;• Кастомный брендинг"
               >
                 PRO
               </span>
@@ -223,75 +234,21 @@ export function Navbar({ title, unreadCount, onMarkAllRead }: NavbarProps) {
 
           {menuOpen && (
             <div className="user-menu-dropdown">
-              <div style={{ padding: '8px 12px', fontSize: '0.75rem', color: 'var(--color-text-muted)', borderBottom: '1px solid var(--color-border)' }}>
-                Plan: <strong style={{ color: user?.subscriptionTier === 'PRO' ? 'var(--color-primary)' : 'var(--color-text)' }}>{user?.subscriptionTier || 'BASIC'}</strong>
-                {user?.subscriptionTier === 'PRO' ? (
-                  <div style={{ marginTop: 6, fontSize: '0.7rem' }}>
-                    <div style={{ fontWeight: '600', marginBottom: 2 }}>PRO Features Active:</div>
-                    <ul style={{ margin: '4px 0 0 12px', padding: 0, listStyleType: 'disc', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <li>Export candidates to CSV</li>
-                      <li>Share candidate by link</li>
-                      <li>Auto replies for candidate</li>
-                      <li>Custom branding</li>
-                    </ul>
-                  </div>
-                ) : (
-                  <div style={{ marginTop: 4 }}>
-                    <Link href="/dashboard/billing" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }} onClick={() => setMenuOpen(false)}>
-                      Upgrade to PRO
-                    </Link>
-                  </div>
-                )}
-              </div>
 
               <Link href="/dashboard/vacancies" className="user-menu-item" onClick={() => setMenuOpen(false)}>
-                <Briefcase size={15} /> Vacancies
+                <Briefcase size={15} /> Вакансии
               </Link>
               <Link href="/dashboard/settings" className="user-menu-item" onClick={() => setMenuOpen(false)}>
-                <User size={15} /> Settings
+                <User size={15} /> Настройки
               </Link>
               <Link href="/dashboard/billing" className="user-menu-item" onClick={() => setMenuOpen(false)}>
-                <CreditCard size={15} /> Billing
+                <CreditCard size={15} /> Тариф
               </Link>
-
-              <div className="user-menu-divider" />
-
-              <div className="theme-toggle-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-muted)' }}>Theme</span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text)' }}>
-                    {currentTheme === 'hh' ? 'HH.ru' : currentTheme === 'dark' ? 'Dark' : 'Light'}
-                  </span>
-                </div>
-                <div className="theme-segmented-control">
-                  <button 
-                    type="button"
-                    className={`theme-segment-btn ${currentTheme === 'light' ? 'active' : ''}`} 
-                    onClick={() => handleThemeChange('light')}
-                  >
-                    Light
-                  </button>
-                  <button 
-                    type="button"
-                    className={`theme-segment-btn ${currentTheme === 'dark' ? 'active' : ''}`} 
-                    onClick={() => handleThemeChange('dark')}
-                  >
-                    Dark
-                  </button>
-                  <button 
-                    type="button"
-                    className={`theme-segment-btn ${currentTheme === 'hh' ? 'active' : ''}`} 
-                    onClick={() => handleThemeChange('hh')}
-                  >
-                    HH
-                  </button>
-                </div>
-              </div>
 
               <div className="user-menu-divider" />
 
               <button className="user-menu-item danger" onClick={handleSignOut}>
-                <LogOut size={15} /> Sign out
+                <LogOut size={15} /> Выйти
               </button>
             </div>
           )}

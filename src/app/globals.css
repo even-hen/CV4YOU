@@ -5,95 +5,8 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Design Tokens — Light (default) ────────────────────────── */
+/* ── Design Tokens — HeadHunter (Default) ───────────────────── */
 :root,
-[data-theme="light"] {
-  --color-bg: #ffffff;
-  --color-surface: #ffffff;
-  --color-surface-2: #f5f7fc;
-  --color-surface-3: #eaecf5;
-  --color-border: #d4d9ec;
-  --color-border-subtle: #e4e8f5;
-
-  --color-text: #1a1f35;
-  --color-text-muted: #5a6380;
-  --color-text-subtle: #6c7693;
-
-  --color-primary: #4a6af0;
-  --color-primary-hover: #3a56e0;
-  --color-primary-dim: rgba(74, 106, 240, 0.1);
-  --color-primary-glow: rgba(74, 106, 240, 0.2);
-
-  --color-success: #10b981;
-  --color-success-dim: rgba(16, 185, 129, 0.1);
-  --color-warning: #f59e0b;
-  --color-warning-dim: rgba(245, 158, 11, 0.1);
-  --color-danger: #ef4444;
-  --color-danger-dim: rgba(239, 68, 68, 0.1);
-  --color-info: #3b82f6;
-  --color-info-dim: rgba(59, 130, 246, 0.1);
-
-  --color-score-high: #10b981;
-  --color-score-mid: #f59e0b;
-  --color-score-low: #ef4444;
-  --color-score-ko: #9099b5;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 0 24px var(--color-primary-glow);
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-
-  --transition: 0.18s ease;
-
-  --nav-height: 60px;
-  --sidebar-w: 0px;
-}
-
-/* ── Design Tokens — Dark ────────────────────────────────────── */
-[data-theme="dark"] {
-  --color-bg: #0d0f14;
-  --color-surface: #161a23;
-  --color-surface-2: #1e2332;
-  --color-surface-3: #252b3b;
-  --color-border: #2a3047;
-  --color-border-subtle: #1f2538;
-
-  --color-text: #e8ecf4;
-  --color-text-muted: #8a93ad;
-  --color-text-subtle: #5a6380;
-
-  --color-primary: #5b7cf6;
-  --color-primary-hover: #7090ff;
-  --color-primary-dim: rgba(91, 124, 246, 0.15);
-  --color-primary-glow: rgba(91, 124, 246, 0.3);
-
-  --color-success: #34d399;
-  --color-success-dim: rgba(52, 211, 153, 0.15);
-  --color-warning: #fbbf24;
-  --color-warning-dim: rgba(251, 191, 36, 0.15);
-  --color-danger: #f87171;
-  --color-danger-dim: rgba(248, 113, 113, 0.15);
-  --color-info: #60a5fa;
-  --color-info-dim: rgba(96, 165, 250, 0.15);
-
-  --color-score-high: #34d399;
-  --color-score-mid: #fbbf24;
-  --color-score-low: #f87171;
-  --color-score-ko: #8a93ad;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 24px var(--color-primary-glow);
-}
-
-/* ── Design Tokens — HeadHunter ────────────────────────────── */
 [data-theme="hh"] {
   --color-bg: #ffffff;
   --color-surface: #ffffff;
@@ -129,6 +42,17 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
   --shadow-glow: 0 0 24px var(--color-primary-glow);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --transition: 0.18s ease;
+
+  --nav-height: 60px;
+  --sidebar-w: 0px;
 }
 
 /* ── Reset & Base ──────────────────────────────────────────── */
@@ -744,81 +668,44 @@ select {
   margin: 4px 0;
 }
 
-.theme-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  font-size: 0.875rem;
-  color: var(--color-text);
-}
-
-/* ── Theme Segmented Control ───────────────────────────────── */
-.theme-segmented-control {
-  display: flex;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 2px;
-  gap: 2px;
-  width: 100%;
-}
-
-.theme-segment-btn {
-  flex: 1;
-  border: none;
-  background: transparent;
-  padding: 6px 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  border-radius: calc(var(--radius-md) - 2px);
-  cursor: pointer;
-  transition: all var(--transition);
-  text-align: center;
-}
-
-.theme-segment-btn:hover {
-  color: var(--color-text);
-}
-
-.theme-segment-btn.active {
-  background: var(--color-surface);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-/* ── HeadHunter Theme Header Overrides ─────────────────────── */
-[data-theme="hh"] .navbar {
+/* ── HeadHunter Theme Header Styles ────────────────────────── */
+[data-theme="hh"] .navbar,
+.navbar {
   background: #171717;
   border-bottom: 1px solid #2d2d2d;
 }
 
-[data-theme="hh"] .navbar-logo {
+[data-theme="hh"] .navbar-logo,
+.navbar-logo {
   color: #ff0000;
 }
 
-[data-theme="hh"] .navbar-title {
+[data-theme="hh"] .navbar-title,
+.navbar-title {
   color: #8c8c8c;
 }
 
-[data-theme="hh"] .user-menu-btn {
+[data-theme="hh"] .user-menu-btn,
+.user-menu-btn {
   background: #2d2d2d;
   border-color: #3d3d3d;
   color: #e8ecf4;
 }
 
-[data-theme="hh"] .user-menu-btn:hover {
+[data-theme="hh"] .user-menu-btn:hover,
+.user-menu-btn:hover {
   background: #3d3d3d;
-  border-color: #e1011c;
+  border-color: #3d3d3d;
   color: #ffffff;
 }
 
-[data-theme="hh"] .notif-btn {
+[data-theme="hh"] .notif-btn,
+.notif-btn {
   color: #8c8c8c;
 }
 
-[data-theme="hh"] .notif-btn:hover {
+[data-theme="hh"] .notif-btn:hover,
+.notif-btn:hover {
   background: #2d2d2d;
   color: #ffffff;
 }
@@ -1482,32 +1369,6 @@ select {
 
 /* ── Color tokens for warnings, info, etc. ──────────────────── */
 :root,
-[data-theme="dark"] {
-  --color-warning: #f59e0b;
-  --color-warning-dim: rgba(245, 158, 11, 0.12);
-  --color-info: #3b82f6;
-  --color-info-dim: rgba(59, 130, 246, 0.12);
-  --color-success: #22c55e;
-  --color-success-dim: rgba(34, 197, 94, 0.12);
-  --color-danger: #ef4444;
-  --color-danger-dim: rgba(239, 68, 68, 0.12);
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-  --color-text-subtle: rgba(255, 255, 255, 0.25);
-}
-
-[data-theme="light"] {
-  --color-warning: #d97706;
-  --color-warning-dim: rgba(217, 119, 6, 0.1);
-  --color-info: #2563eb;
-  --color-info-dim: rgba(37, 99, 235, 0.1);
-  --color-success: #16a34a;
-  --color-success-dim: rgba(22, 163, 74, 0.1);
-  --color-danger: #dc2626;
-  --color-danger-dim: rgba(220, 38, 38, 0.1);
-  --color-border-subtle: rgba(0, 0, 0, 0.05);
-  --color-text-subtle: rgba(0, 0, 0, 0.3);
-}
-
 [data-theme="hh"] {
   --color-warning: #d97706;
   --color-warning-dim: rgba(217, 119, 6, 0.1);
@@ -1811,7 +1672,7 @@ select {
 
 .job-input {
   width: 100%;
-  background: var(--color-surface-2);
+  background: var(--color-surface);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text);

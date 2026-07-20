@@ -7,34 +7,34 @@ import { Suspense } from 'react'
 import { Check, Loader2, Shield, AlertTriangle } from 'lucide-react'
 
 const DURATIONS = [
-  { key: '1m', label: 'Monthly', months: 1, saving: null },
-  { key: '1y', label: 'Annual', months: 12, saving: 'Save 30%' },
+  { key: '1m', label: 'В месяц', months: 1, saving: null },
+  { key: '1y', label: 'В год', months: 12, saving: 'Скидка 30%' },
 ] as const
 
 const PLANS = [
   {
     key: 'basic',
-    name: 'Basic (Free)',
-    limit: '10 active vacancies',
-    features: ['Up to 10 active vacancies', 'AI CV matching & scoring', 'Candidate management', 'Email notifications', 'On-demand CV generation'],
+    name: 'Базовый (Бесплатно)',
+    limit: '10 активных вакансий',
+    features: ['До 10 активных вакансий', 'ИИ-подбор и оценка резюме', 'Управление кандидатами', 'Email-уведомления', 'Генерация резюме по запросу'],
     prices: { '1m': 0, '1y': 0 },
     recommended: false,
   },
   {
     key: 'pro',
     name: 'Pro',
-    limit: '30 active vacancies',
+    limit: '30 активных вакансий',
     features: [
-      'Up to 30 active vacancies',
-      'AI CV matching & scoring',
-      'Candidate management',
-      'Email notifications',
-      'On-demand CV generation',
-      'Priority support',
-      'Export candidates to CSV (Pro)',
-      'Share candidate by link (Pro)',
-      'Auto replies for candidates (Pro)',
-      'Custom branding (Pro)',
+      'До 30 активных вакансий',
+      'ИИ-подбор и оценка резюме',
+      'Управление кандидатами',
+      'Email-уведомления',
+      'Генерация резюме по запросу',
+      'Приоритетная поддержка',
+      'Экспорт кандидатов в CSV (Pro)',
+      'Ссылка на кандидата (Pro)',
+      'Автоответы кандидатам (Pro)',
+      'Кастомный брендинг (Pro)',
     ],
     prices: { '1m': 299, '1y': 2499 },
     recommended: true,
@@ -65,11 +65,11 @@ function BillingContent() {
         body: JSON.stringify({ planKey: fullKey }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Payment failed')
+      if (!res.ok) throw new Error(data.error || 'Оплата не удалась')
       // Redirect to YooKassa confirmation URL
       window.location.href = data.confirmationUrl
     } catch (e: any) {
-      setError(e.message || 'Failed to initiate payment. Please try again.')
+      setError(e.message || 'Не удалось инициировать оплату. Пожалуйста, попробуйте еще раз.')
       setLoading(null)
     }
   }
@@ -77,13 +77,13 @@ function BillingContent() {
   return (
     <div>
       <div className="mb-6">
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Billing & Plans</h1>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Тарифы и оплата</h1>
         <p className="text-muted text-sm mt-2">
           {currentTier === 'pro' && subEndsAt && subEndsAt > now
-            ? `Current plan: PRO. Active until ${subEndsAt.toLocaleDateString()}.`
+            ? `Текущий тариф: PRO. Активен до ${subEndsAt.toLocaleDateString()}.`
             : currentTier === 'pro'
-              ? 'Your PRO subscription has expired. You are now on the BASIC Free plan.'
-              : 'Current plan: BASIC (Free).'}
+              ? 'Ваша PRO-подписка истекла. Вы переведены на бесплатный тариф БАЗОВЫЙ.'
+              : 'Текущий тариф: БАЗОВЫЙ (Бесплатный).'}
         </p>
       </div>
 
@@ -95,7 +95,7 @@ function BillingContent() {
 
       {/* Duration selector */}
       <div className="mb-6">
-        <p className="section-title mb-3">Billing period</p>
+        <p className="section-title mb-3">Период оплаты</p>
         <div className="duration-tabs" style={{ maxWidth: 360 }}>
           {DURATIONS.map(d => (
             <button
@@ -120,7 +120,7 @@ function BillingContent() {
 
           return (
             <div key={plan.key} className={`plan-card${plan.recommended ? ' recommended' : ''}`}>
-              {plan.recommended && <span className="plan-badge">Most Popular</span>}
+              {plan.recommended && <span className="plan-badge">Популярный</span>}
 
               <div>
                 <div className="plan-name">{plan.name}</div>
@@ -129,11 +129,11 @@ function BillingContent() {
 
               <div className="plan-price-row">
                 {price === 0 ? (
-                  <span className="plan-price">Free</span>
+                  <span className="plan-price">Бесплатно</span>
                 ) : (
                   <>
-                    <span className="plan-currency">₽</span>
                     <span className="plan-price">{price.toLocaleString('ru')}</span>
+                    <span className="plan-currency"> ₽</span>
                     <span className="plan-period">/ {DURATIONS.find(d => d.key === duration)?.label.toLowerCase()}</span>
                   </>
                 )}
@@ -149,12 +149,12 @@ function BillingContent() {
                 onClick={() => handlePurchase(plan.key)}
               >
                 {loading === planLoadingKey
-                  ? <><Loader2 size={15} className="spin" /> Processing…</>
+                  ? <><Loader2 size={15} className="spin" /> Обработка…</>
                   : plan.key === 'basic'
-                    ? <><Check size={15} /> Current Plan</>
+                    ? <><Check size={15} /> Текущий тариф</>
                     : isCurrent
-                      ? <><Check size={15} /> Current Plan</>
-                      : `Pay ₽${price.toLocaleString('ru')}`
+                      ? <><Check size={15} /> Текущий тариф</>
+                      : `Оплатить ${price.toLocaleString('ru')} ₽`
                 }
               </button>
             </div>
@@ -164,7 +164,7 @@ function BillingContent() {
 
       {/* Trust indicators */}
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', marginTop: 24, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Shield size={14} /> Payments via YooKassa</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Shield size={14} /> Платежи через ЮKassa</span>
       </div>
     </div>
   )

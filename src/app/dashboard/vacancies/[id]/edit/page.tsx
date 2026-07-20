@@ -14,7 +14,7 @@ export default function EditVacancyPage() {
     async function load() {
       const res = await fetch(`/api/vacancies/${id}`)
       if (!res.ok) {
-        setError('Vacancy not found.')
+        setError('Вакансия не найдена.')
         setLoading(false)
         return
       }

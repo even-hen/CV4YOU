@@ -37,31 +37,7 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get('content-type') || ''
     const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || ''
 
-    // 1. Manual CSRF token verification
-    const cookieName = req.url.startsWith('https://') ? '__Host-authjs.csrf-token' : 'authjs.csrf-token'
-    let cookieVal = req.cookies.get(cookieName)?.value
-    if (!cookieVal) {
-      cookieVal = req.cookies.get('authjs.csrf-token')?.value || req.cookies.get('__Host-authjs.csrf-token')?.value
-    }
-
-    if (!cookieVal) {
-      return NextResponse.json({ error: 'CSRF token missing' }, { status: 403 })
-    }
-
-    const [cookieToken, cookieHash] = cookieVal.split('|')
-    if (!cookieToken || !cookieHash) {
-      return NextResponse.json({ error: 'Invalid CSRF token structure' }, { status: 403 })
-    }
-
-    const expectedHash = crypto
-      .createHash('sha256')
-      .update(`${cookieToken}${secret}`)
-      .digest('hex')
-
-    if (cookieHash !== expectedHash) {
-      return NextResponse.json({ error: 'CSRF token signature invalid' }, { status: 403 })
-    }
-
+    // 1. Extract CSRF token from request body/header
     let bodyToken: string | null = null
     let email = ''
 
@@ -86,7 +62,39 @@ export async function POST(req: NextRequest) {
     const headerToken = req.headers.get('x-csrf-token') || req.headers.get('X-CSRF-Token')
     const finalBodyToken = bodyToken || headerToken
 
-    if (!finalBodyToken || finalBodyToken !== cookieToken) {
+    // 2. Manual CSRF token verification against available CSRF cookies
+    const csrfCookies = req.cookies.getAll().filter(c => c.name.includes('csrf-token'))
+    if (csrfCookies.length === 0) {
+      return NextResponse.json({ error: 'CSRF token missing' }, { status: 403 })
+    }
+
+    let validCsrfMatch = false
+    let hasInvalidSig = false
+
+    for (const cookie of csrfCookies) {
+      const [cookieToken, cookieHash] = (cookie.value || '').split('|')
+      if (!cookieToken || !cookieHash) continue
+
+      const expectedHash = crypto
+        .createHash('sha256')
+        .update(`${cookieToken}${secret}`)
+        .digest('hex')
+
+      if (cookieHash !== expectedHash) {
+        hasInvalidSig = true
+        continue
+      }
+
+      if (finalBodyToken && cookieToken === finalBodyToken) {
+        validCsrfMatch = true
+        break
+      }
+    }
+
+    if (!validCsrfMatch) {
+      if (hasInvalidSig && !finalBodyToken) {
+        return NextResponse.json({ error: 'CSRF token signature invalid' }, { status: 403 })
+      }
       return NextResponse.json({ error: 'CSRF token mismatch' }, { status: 403 })
     }
 

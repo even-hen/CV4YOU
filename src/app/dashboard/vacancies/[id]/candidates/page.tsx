@@ -41,7 +41,7 @@ type TabKey = 'new' | 'all'
 function ScoreBadge({ score, status }: { score: number | null; status?: string }) {
   if (status === 'FAILED_SCORING') {
     return (
-      <span className="score-badge score-low" title="AI evaluation failed" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+      <span className="score-badge score-low" title="ИИ-оценка не удалась" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
         ⚠️
       </span>
     )
@@ -113,18 +113,18 @@ export default function CandidatesPage() {
         if (res.status === 401) {
           setHhAuthExpired(true)
         }
-        showSyncMsg('error', data.error || 'Failed to sync')
+        showSyncMsg('error', data.error || 'Синхронизация не удалась')
         return
       }
       const msg = data.imported > 0
-        ? `Sync complete — imported ${data.imported} new candidate${data.imported !== 1 ? 's' : ''}.`
-        : 'Sync complete — no new candidates found.'
+        ? `Синхронизация завершена — импортировано новых кандидатов: ${data.imported}.`
+        : 'Синхронизация завершена — новых кандидатов не найдено.'
       showSyncMsg(data.syncPaused ? 'warn' : 'success',
-        data.syncPaused ? `${msg} (Note: background auto-sync is paused for this vacancy.)` : msg
+        data.syncPaused ? `${msg} (Примечание: автоматическая фоновая синхронизация приостановлена для этой вакансии.)` : msg
       )
       fetchCandidates(1, false)
     } catch (e: any) {
-      showSyncMsg('error', e.message || 'Error occurred during sync')
+      showSyncMsg('error', e.message || 'Произошла ошибка при синхронизации')
     } finally {
       setSyncing(false)
     }
@@ -146,14 +146,14 @@ export default function CandidatesPage() {
         if (res.status === 401) {
           setHhAuthExpired(true)
         }
-        showImportMsg('error', data.error || 'Failed to import')
+        showImportMsg('error', data.error || 'Не удалось импортировать')
         return
       }
-      showImportMsg('success', `Imported "${data.candidateName}" — AI scoring started.`)
+      showImportMsg('success', `Импортирован кандидат "${data.candidateName}" — запущена ИИ-оценка.`)
       setImportUrl('')
       fetchCandidates(1, false)
     } catch (e: any) {
-      showImportMsg('error', e.message || 'Failed to import candidate link')
+      showImportMsg('error', e.message || 'Не удалось импортировать кандидата по ссылке')
     } finally {
       setImporting(false)
     }
@@ -280,7 +280,7 @@ export default function CandidatesPage() {
   }
 
   async function deleteCandidate(id: string) {
-    if (!confirm('Remove this application permanently?')) return
+    if (!confirm('Удалить этот отклик навсегда?')) return
     setDeleting(id)
     try {
       await fetch(`/api/candidates/${id}`, { method: 'DELETE' })
@@ -303,7 +303,7 @@ export default function CandidatesPage() {
       a.click()
       URL.revokeObjectURL(url)
     } catch (_e) {
-      alert('Failed to generate CV. Please try again.')
+      alert('Не удалось сгенерировать резюме. Пожалуйста, попробуйте еще раз.')
     } finally {
       setDownloading(null)
     }
@@ -318,7 +318,7 @@ export default function CandidatesPage() {
       if (!res.ok) throw new Error('Retry failed')
       const data = await res.json()
       if (data.purged) {
-        alert('AI Scoring complete: Candidate score is below threshold (50) and has been automatically filtered out.')
+        alert('ИИ-оценка завершена: балл кандидата ниже порога (50), отклик автоматически отфильтрован.')
         setCandidates(prev => prev.filter(c => c.id !== candidateId))
         if (expanded === candidateId) {
           setExpanded(null)
@@ -341,7 +341,7 @@ export default function CandidatesPage() {
         )
       }
     } catch (_e) {
-      alert('Failed to retry AI scoring. Please try again.')
+      alert('Не удалось запустить повторную ИИ-оценку. Пожалуйста, попробуйте еще раз.')
     } finally {
       setRetrying(null)
     }
@@ -366,7 +366,7 @@ export default function CandidatesPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0px 10px', alignItems: 'center' }}>
           <div style={{ gridRow: '1 / 2', gridColumn: '1 / 2' }}>
             <Link href="/dashboard/vacancies" className="btn btn-ghost btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              <ArrowLeft size={16} /> Back
+              <ArrowLeft size={16} /> Назад
             </Link>
           </div>
           {vacancy ? (
@@ -405,14 +405,14 @@ export default function CandidatesPage() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
             <AlertTriangle size={16} />
-            HeadHunter Connection Expired
+            Сессия HeadHunter истекла
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
-            HeadHunter synchronization is paused because your credentials have expired or were revoked. Please reconnect your account.
+            Синхронизация с HeadHunter приостановлена, так как время авторизации истекло. Пожалуйста, подключите аккаунт заново.
           </p>
           <div>
             <a href="/dashboard/settings" className="btn btn-secondary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-              Reconnect in Settings
+              Переподключить в настройках
             </a>
           </div>
         </div>
@@ -433,11 +433,11 @@ export default function CandidatesPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-primary)' }}>
-                🔗 Connected to hh.ru: "{vacancy.hhVacancyTitle || vacancy.hhVacancyId}"
+                🔗 Подключено к hh.ru: "{vacancy.hhVacancyTitle || vacancy.hhVacancyId}"
               </span>
               {!vacancy.hhSyncEnabled && (
                 <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 500, marginTop: 2 }}>
-                  ⚠️ Background sync is paused.
+                  ⚠️ Фоновая синхронизация приостановлена.
                 </span>
               )}
             </div>
@@ -451,7 +451,7 @@ export default function CandidatesPage() {
                 disabled={syncing}
               >
                 {syncing ? <Loader2 size={13} className="spin" /> : <RefreshCw size={13} />}
-                {syncing ? 'Syncing…' : 'Sync Now'}
+                {syncing ? 'Синхронизация…' : 'Синхронизировать'}
               </button>
               {/* Inline sync result toast */}
               {syncMessage && (
@@ -473,14 +473,14 @@ export default function CandidatesPage() {
 
           <div style={{ borderTop: '1px dashed rgba(79, 70, 229, 0.2)', paddingTop: 12 }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, display: 'block', marginBottom: 6 }}>
-              Import candidate by resume link:
+              Импорт кандидата по ссылке на резюме:
             </span>
             <form onSubmit={handleImportLink} style={{ display: 'flex', gap: 8 }}>
               <input
                 type="url"
                 className="form-input"
                 style={{ flex: 1, height: '32px', fontSize: '0.8125rem', padding: '0 10px' }}
-                placeholder="e.g. https://hh.ru/resume/502ff8b100018bdd..."
+                placeholder="например, https://hh.ru/resume/502ff8b100018bdd..."
                 value={importUrl}
                 onChange={e => setImportUrl(e.target.value)}
                 required
@@ -491,7 +491,7 @@ export default function CandidatesPage() {
                 style={{ height: '32px', padding: '0 12px' }}
                 disabled={importing}
               >
-                {importing ? <Loader2 size={13} className="spin" /> : 'Import'}
+                {importing ? <Loader2 size={13} className="spin" /> : 'Импортировать'}
               </button>
             </form>
             {/* Inline import result toast */}
@@ -520,13 +520,13 @@ export default function CandidatesPage() {
               className={`cand-tab${tab === 'new' ? ' active' : ''}`}
               onClick={() => setTab('new')}
             >
-              New {newCount > 0 && <span className="cand-tab-badge">{newCount}</span>}
+              Новые {newCount > 0 && <span className="cand-tab-badge">{newCount}</span>}
             </button>
             <button
               className={`cand-tab${tab === 'all' ? ' active' : ''}`}
               onClick={() => setTab('all')}
             >
-              All
+              Все
             </button>
           </div>
 
@@ -539,7 +539,7 @@ export default function CandidatesPage() {
               style={{ gap: 6 }}
             >
               <SlidersHorizontal size={14} />
-              <span>{threshold === 0 ? 'All' : `${threshold}%`}</span>
+              <span>{threshold === 0 ? 'Все' : `${threshold}%`}</span>
               <ChevronDown size={13} />
             </button>
             {thresholdOpen && (
@@ -556,7 +556,7 @@ export default function CandidatesPage() {
                   >
                     {threshold === val && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
                     {threshold !== val && <span style={{ width: 14 }} />}
-                    {val === 0 ? 'All' : `${val}%`}
+                    {val === 0 ? 'Все' : `${val}%`}
                   </button>
                 ))}
               </div>
@@ -572,7 +572,7 @@ export default function CandidatesPage() {
               style={{ gap: 6 }}
             >
               <ArrowUpDown size={14} />
-              <span>{sort === 'score' ? 'Score' : sort === 'date' ? 'New' : 'Name'}</span>
+              <span>{sort === 'score' ? 'Балл' : sort === 'date' ? 'Новые' : 'Имя'}</span>
               <ChevronDown size={13} />
             </button>
             {sortOpen && (
@@ -589,7 +589,7 @@ export default function CandidatesPage() {
                   >
                     {sort === k && <Check size={14} style={{ color: 'var(--color-primary)' }} />}
                     {sort !== k && <span style={{ width: 14 }} />}
-                    {k === 'score' ? 'Score' : k === 'date' ? 'New' : 'Name'}
+                    {k === 'score' ? 'Балл' : k === 'date' ? 'Новые' : 'Имя'}
                   </button>
                 ))}
               </div>
@@ -601,7 +601,7 @@ export default function CandidatesPage() {
             <Search size={14} className="cand-search-icon" />
             <input
               className="cand-search-input"
-              placeholder="Search by name…"
+              placeholder="Поиск по имени…"
               value={q}
               onChange={e => setQ(e.target.value)}
             />
@@ -613,17 +613,17 @@ export default function CandidatesPage() {
           {loading ? (
             <div className="candidates-loading">
               <Loader2 size={28} className="spin" />
-              <span>Loading candidates…</span>
+              <span>Загрузка кандидатов…</span>
 
             </div>
           ) : candidates.length === 0 ? (
             <div className="candidates-empty">
               <div className="candidates-empty-icon">📭</div>
-              <h3>No candidates yet</h3>
+              <h3>Откликов пока нет</h3>
               <p>
                 {tab === 'new'
-                  ? 'No new applications. Switch to "All" to see reviewed candidates.'
-                  : 'No applications match your current filters.'}
+                  ? 'Нет новых откликов. Переключитесь на «Все», чтобы просмотреть ранее открытые.'
+                  : 'Нет откликов, соответствующих выбранным фильтрам.'}
               </p>
             </div>
           ) : (
@@ -681,10 +681,10 @@ export default function CandidatesPage() {
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: 600, fontSize: '0.9rem' }}>
                             <AlertTriangle size={16} />
-                            AI Resume Evaluation Failed
+                            ИИ-оценка резюме не удалась
                           </div>
                           <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-subtle)', lineHeight: 1.4 }}>
-                            The system failed to evaluate this resume with the AI model. You can review the candidate's contacts or manually trigger a retry.
+                            Системе не удалось оценить это резюме с помощью ИИ. Вы можете просмотреть контакты кандидата или запустить оценку повторно.
                           </p>
                           <div>
                             <button
@@ -699,7 +699,7 @@ export default function CandidatesPage() {
                               ) : (
                                 <RefreshCw size={12} />
                               )}
-                              Retry AI Scoring
+                              Повторить оценку
                             </button>
                           </div>
                         </div>
@@ -719,13 +719,13 @@ export default function CandidatesPage() {
                             className="cand-action-btn active-blue"
                             onClick={() => retryScoring(c.id)}
                             disabled={retrying === c.id}
-                            title="Retry AI Scoring"
+                            title="Повторить оценку"
                             style={{ gap: 6 }}
                           >
                             {retrying === c.id ? (
-                              <><Loader2 size={14} className="spin" /> Retrying…</>
+                              <><Loader2 size={14} className="spin" /> Повтор…</>
                             ) : (
-                              <><RefreshCw size={14} /> Retry</>
+                              <><RefreshCw size={14} /> Повторить</>
                             )}
                           </button>
                         )}
@@ -733,38 +733,38 @@ export default function CandidatesPage() {
                           className="cand-action-btn danger"
                           onClick={() => deleteCandidate(c.id)}
                           disabled={deleting === c.id}
-                          title="Delete application"
+                          title="Удалить отклик"
                         >
                           {deleting === c.id ? (
                             <Loader2 size={14} className="spin" />
                           ) : (
-                            <><Trash2 size={14} /> Delete</>
+                            <><Trash2 size={14} /> Удалить</>
                           )}
                         </button>
                         <button
                           className="cand-action-btn"
                           onClick={() => downloadCV(c)}
                           disabled={downloading === c.id}
-                          title="Download structured CV"
+                          title="Скачать резюме"
                         >
                           {downloading === c.id ? (
-                            <><Loader2 size={14} className="spin" /> Generating…</>
+                            <><Loader2 size={14} className="spin" /> Генерация…</>
                           ) : (
-                            <><Download size={14} /> Download</>
+                            <><Download size={14} /> Скачать</>
                           )}
                         </button>
                         <button
                           className={`cand-action-btn${!c.seen ? ' active-blue' : ''}`}
                           onClick={() => toggleSeen(c)}
                           disabled={seenToggling === c.id}
-                          title={c.seen ? 'Unread' : 'Read'}
+                          title={c.seen ? 'Как непрочитанное' : 'Как прочитанное'}
                         >
                           {seenToggling === c.id ? (
                             <Loader2 size={14} className="spin" />
                           ) : c.seen ? (
-                            <><EyeOff size={14} /> Unread</>
+                            <><EyeOff size={14} /> Непрочитано</>
                           ) : (
-                            <><Eye size={14} /> Read</>
+                            <><Eye size={14} /> Прочитано</>
                           )}
                         </button>
                       </div>
@@ -774,7 +774,7 @@ export default function CandidatesPage() {
                         {c.pros.length > 0 && (
                           <div className="proscons-col">
                             <h4 className="detail-section-title pros">
-                              <CheckCircle2 size={14} /> Strengths
+                              <CheckCircle2 size={14} /> Сильные стороны
                             </h4>
                             <ul className="proscons-list pros">
                               {c.pros.map((p, i) => <li key={i}>{p}</li>)}
@@ -784,7 +784,7 @@ export default function CandidatesPage() {
                         {c.cons.length > 0 && (
                           <div className="proscons-col">
                             <h4 className="detail-section-title cons">
-                              <XCircle size={14} /> Gaps
+                              <XCircle size={14} /> Слабые стороны
                             </h4>
                             <ul className="proscons-list cons">
                               {c.cons.map((g, i) => <li key={i}>{g}</li>)}
@@ -795,7 +795,7 @@ export default function CandidatesPage() {
 
                       {/* Undercut timestamp footer */}
                       <div style={{ borderTop: '1px solid var(--color-border-subtle)', fontSize: '0.75rem', color: 'var(--color-text-subtle)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Calendar size={13} /> Submitted on {new Date(c.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        <Calendar size={13} /> Отклик отправлен {new Date(c.createdAt).toLocaleString('ru', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
                   )}
@@ -811,9 +811,9 @@ export default function CandidatesPage() {
                     style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
                   >
                     {loadingMore ? (
-                      <><Loader2 size={16} className="spin" /> Loading…</>
+                      <><Loader2 size={16} className="spin" /> Загрузка…</>
                     ) : (
-                      'Load More'
+                      'Загрузить еще'
                     )}
                   </button>
                 </div>
@@ -842,7 +842,7 @@ export default function CandidatesPage() {
           boxShadow: 'var(--shadow-lg)',
         }}
         onClick={() => fetchCandidates()}
-        title="Refresh list"
+        title="Обновить список"
       >
         <RefreshCw size={22} />
       </button>

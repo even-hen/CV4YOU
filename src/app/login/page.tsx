@@ -29,7 +29,7 @@ export default function LoginPage() {
     setLoading(false)
 
     if (result?.error) {
-      setError('Invalid email or password.')
+      setError('Неверный адрес почты или пароль.')
     } else {
       router.push('/dashboard')
     }
@@ -38,8 +38,8 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">CV4YOU</div>
-        <p className="auth-subtitle">Sign in to your recruiter account</p>
+        <div className="auth-logo">📋 CV4YOU</div>
+        <p className="auth-subtitle">Войдите в свой аккаунт</p>
 
         {error && (
           <div className="auth-error">{error}</div>
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label className="form-label" htmlFor="email">Email</label>
+            <label className="form-label" htmlFor="email">Электронная почта</label>
             <input
               id="email"
               type="email"
@@ -61,7 +61,7 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
+            <label className="form-label" htmlFor="password">Пароль</label>
             <div className="pw-wrapper">
               <input
                 id="password"
@@ -86,15 +86,15 @@ export default function LoginPage() {
 
           <button type="submit" className="btn btn-primary btn-full mt-4" disabled={loading}>
             {loading
-              ? <><Loader2 size={16} className="spin" /> Signing in…</>
-              : <><LogIn size={16} /> Sign in</>
+              ? <><Loader2 size={16} className="spin" /> Вход…</>
+              : <><LogIn size={16} /> Войти</>
             }
           </button>
         </form>
 
         <p className="auth-footer">
-          Don&apos;t have an account?{' '}
-          <Link href="/register">Create one free</Link>
+          Нет аккаунта?{' '}
+          <Link href="/register">Зарегистрироваться</Link>
         </p>
       </div>
     </div>

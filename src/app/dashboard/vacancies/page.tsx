@@ -146,20 +146,20 @@ export default function VacanciesPage() {
 
 
   const SORT_LABELS: Record<SortKey, string> = {
-    recent: 'Newest first',
-    new_apps: 'Applications',
-    name: 'Name',
+    recent: 'Сначала новые',
+    new_apps: 'По откликам',
+    name: 'По названию',
   }
 
   return (
     <div>
       {limitError && (
         <div className="callout callout-warning mb-4" style={{ marginBottom: 16 }}>
-          ⚠️ {limitError}. <a href="/dashboard/billing">Upgrade to Pro</a> for up to 30 active vacancies.
+          ⚠️ {limitError}. <a href="/dashboard/billing">Перейти на PRO</a>, чтобы иметь до 30 активных вакансий.
         </div>
       )}
 
-      <h1 style={{ fontSize: '1.375rem', fontWeight: 800, marginLeft: 24, marginBottom: 16 }}>Vacancies</h1>
+      <h1 style={{ fontSize: '1.375rem', fontWeight: 800, marginLeft: 24, marginBottom: 16 }}>Вакансии</h1>
 
       {/* White Dashboard Container */}
       <div className="dashboard-container">
@@ -167,10 +167,10 @@ export default function VacanciesPage() {
         <div className="control-bar">
           <div className="tabs">
             <button className={`tab${tab === 'active' ? ' active' : ''}`} onClick={() => setTab('active')}>
-              Active
+              Активные
             </button>
             <button className={`tab${tab === 'archived' ? ' active' : ''}`} onClick={() => setTab('archived')}>
-              Archived
+              В архиве
             </button>
           </div>
 
@@ -202,7 +202,7 @@ export default function VacanciesPage() {
             <input
               type="text"
               className="form-input"
-              placeholder="Search role or company…"
+              placeholder="Поиск по должности или компании…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{ paddingLeft: 36, background: 'var(--color-surface)' }}
@@ -219,11 +219,11 @@ export default function VacanciesPage() {
         ) : vacancies.length === 0 ? (
           <div className="empty-state">
             <Briefcase size={40} className="empty-state-icon" />
-            <h3>{tab === 'active' ? 'No active vacancies' : 'No archived vacancies'}</h3>
-            <p>{tab === 'active' ? 'Create your first vacancy to start receiving applications.' : 'Archived vacancies will appear here.'}</p>
+            <h3>{tab === 'active' ? 'Нет активных вакансий' : 'Нет архивированных вакансий'}</h3>
+            <p>{tab === 'active' ? 'Создайте свою первую вакансию, чтобы начать принимать отклики.' : 'Архивированные вакансии будут отображаться здесь.'}</p>
             {tab === 'active' && (
               <button className="btn btn-primary mt-4" onClick={() => router.push('/dashboard/vacancies/new')}>
-                <Plus size={15} /> Create Vacancy
+                <Plus size={15} /> Создать вакансию
               </button>
             )}
           </div>
@@ -250,10 +250,10 @@ export default function VacanciesPage() {
                 >
                   {loadingMoreArchived ? (
                     <>
-                      <span className="spinner" style={{ width: 14, height: 14 }} /> Loading…
+                      <span className="spinner" style={{ width: 14, height: 14 }} /> Загрузка…
                     </>
                   ) : (
-                    'Load More'
+                    'Загрузить еще'
                   )}
                 </button>
               </div>
@@ -267,18 +267,18 @@ export default function VacanciesPage() {
       {confirmArchive && (
         <div className="modal-overlay" onClick={() => setConfirmArchive(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">Archive vacancy?</h2>
+            <h2 className="modal-title">Архивировать вакансию?</h2>
             <p className="modal-body">
-              <strong>{confirmArchive.role}</strong> at <strong>{confirmArchive.company}</strong> will be moved to Archived. Candidates will no longer be able to submit applications. Existing applications are preserved.
+              Вакансия <strong>{confirmArchive.role}</strong> в компании <strong>{confirmArchive.company}</strong> будет перенесена в архив. Кандидаты больше не смогут отправлять отклики. Существующие отклики сохраняются.
             </p>
             <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmArchive(null)}>Cancel</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmArchive(null)}>Отмена</button>
               <button
                 className="btn btn-danger"
                 disabled={actionLoading === confirmArchive.id}
                 onClick={() => archiveVacancy(confirmArchive)}
               >
-                <Archive size={14} /> Archive
+                <Archive size={14} /> В архив
               </button>
             </div>
           </div>
@@ -289,18 +289,18 @@ export default function VacanciesPage() {
       {confirmRestore && (
         <div className="modal-overlay" onClick={() => setConfirmRestore(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">Restore vacancy?</h2>
+            <h2 className="modal-title">Восстановить вакансию?</h2>
             <p className="modal-body">
-              <strong>{confirmRestore.role}</strong> at <strong>{confirmRestore.company}</strong> will be moved back to Active. Make sure you have available vacancy slots.
+              Вакансия <strong>{confirmRestore.role}</strong> в компании <strong>{confirmRestore.company}</strong> будет возвращена в список активных. Убедитесь, что у вас есть свободные слоты для вакансий.
             </p>
             <div className="modal-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmRestore(null)}>Cancel</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmRestore(null)}>Отмена</button>
               <button
                 className="btn btn-primary"
                 disabled={actionLoading === confirmRestore.id}
                 onClick={() => restoreVacancy(confirmRestore)}
               >
-                <RotateCcw size={14} /> Restore
+                <RotateCcw size={14} /> Восстановить
               </button>
             </div>
           </div>
@@ -324,7 +324,7 @@ export default function VacanciesPage() {
           boxShadow: 'var(--shadow-lg)',
         }}
         onClick={() => router.push('/dashboard/vacancies/new')}
-        title="Create new vacancy"
+        title="Создать новую вакансию"
         id="btn-create-vacancy"
       >
         <Plus size={24} />
@@ -346,7 +346,7 @@ function VacancyCard({ vacancy: v, copiedId, onEdit, onViewApps, onCopyLink }: C
   const isCopied = copiedId === v.id
 
   return (
-    <div className="vacancy-card" onClick={onViewApps} style={{ cursor: 'pointer' }} title="Click to view applications">
+    <div className="vacancy-card" onClick={onViewApps} style={{ cursor: 'pointer' }} title="Нажмите для просмотра откликов">
       <div className="vacancy-card-header">
         <div style={{ minWidth: 0 }}>
           <div className="vacancy-role">{v.role}</div>
@@ -354,34 +354,34 @@ function VacancyCard({ vacancy: v, copiedId, onEdit, onViewApps, onCopyLink }: C
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {v.newApplications > 0 && (
-            <span className="badge badge-primary" title={`${v.newApplications} new application${v.newApplications !== 1 ? 's' : ''}`}>
-              {v.newApplications} new
+            <span className="badge badge-primary" title={`${v.newApplications} новых откликов`}>
+              {v.newApplications} новые
             </span>
           )}
-          <span className="badge badge-muted" title={`${v.totalApplications} total application${v.totalApplications !== 1 ? 's' : ''}`}>
+          <span className="badge badge-muted" title={`${v.totalApplications} всего откликов`}>
             <Users size={11} /> {v.totalApplications}
           </span>
         </div>
       </div>
 
       <div className="vacancy-meta" style={{ marginBottom: 0 }}>
-        <span>{new Date(v.createdAt).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        <span>{new Date(v.createdAt).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
 
         {/* Link status & Chain link copy icon */}
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: v.linkEnabled ? 'var(--color-success)' : 'var(--color-text-subtle)' }}>
           {v.linkEnabled ? <ExternalLink size={13} /> : <Unlink size={13} />}
-          {v.linkEnabled ? 'Link active' : 'Link disabled'}
+          {v.linkEnabled ? 'Ссылка активна' : 'Ссылка отключена'}
           {v.linkEnabled && (
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); onCopyLink(); }}
               style={{ background: 'none', border: 'none', padding: '2px 4px', cursor: 'pointer', color: isCopied ? 'var(--color-success)' : 'var(--color-primary)', display: 'inline-flex', alignItems: 'center' }}
-              title="Copy candidate link"
+              title="Скопировать ссылку"
             >
               <Link2 size={14} />
             </button>
           )}
-          {isCopied && <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600, marginLeft: 2 }}>Copied!</span>}
+          {isCopied && <span style={{ fontSize: '0.75rem', color: 'var(--color-success)', fontWeight: 600, marginLeft: 2 }}>Скопировано!</span>}
         </span>
 
         {/* Edit icon aligned to right */}
@@ -389,7 +389,7 @@ function VacancyCard({ vacancy: v, copiedId, onEdit, onViewApps, onCopyLink }: C
           type="button"
           onClick={(e) => { e.stopPropagation(); onEdit(); }}
           className="edit-vacancy-btn"
-          title="Edit vacancy"
+          title="Редактировать вакансию"
         >
           <Pencil size={15} />
         </button>

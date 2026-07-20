@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Apply for a Job — CV4YOU',
-  description: 'Submit your CV and apply for this position',
+  title: 'Откликнуться на вакансию',
+  description: 'Загрузите ваше резюме и отправьте отклик',
 }
 
 export default function JobsLayout({ children }: { children: React.ReactNode }) {

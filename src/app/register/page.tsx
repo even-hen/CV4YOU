@@ -30,7 +30,7 @@ export default function RegisterPage() {
     setLoading(false)
 
     if (!res.ok) {
-      setError(data.error || 'Registration failed. Please try again.')
+      setError(data.error || 'Регистрация не удалась. Пожалуйста, попробуйте еще раз.')
       return
     }
 
@@ -43,11 +43,8 @@ export default function RegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">CV4YOU</div>
-        <h1 className="auth-title">Start hiring smarter</h1>
-        <p className="auth-subtitle">
-          Free Basic plan &mdash; up to 10 active vacancies
-        </p>
+        <div className="auth-logo">📋 CV4YOU</div>
+        <p className="auth-subtitle">Зарегистрируйтесь</p>
 
         {error && (
           <div className="auth-error">{error}</div>
@@ -55,12 +52,12 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label className="form-label" htmlFor="name">Your name</label>
+            <label className="form-label" htmlFor="name">Ваше имя</label>
             <input
               id="name"
               type="text"
               className="form-input"
-              placeholder="Jane Smith"
+              placeholder="Иван Иванов"
               value={name}
               onChange={e => setName(e.target.value)}
               autoComplete="name"
@@ -68,7 +65,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="email">Work email</label>
+            <label className="form-label" htmlFor="email">Рабочая почта</label>
             <input
               id="email"
               type="email"
@@ -82,13 +79,13 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
+            <label className="form-label" htmlFor="password">Пароль</label>
             <div className="pw-wrapper">
               <input
                 id="password"
                 type={showPw ? 'text' : 'password'}
                 className="form-input"
-                placeholder="At least 8 characters"
+                placeholder="Не менее 8 символов"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -108,15 +105,15 @@ export default function RegisterPage() {
 
           <button type="submit" className="btn btn-primary btn-full mt-4" disabled={loading}>
             {loading
-              ? <><Loader2 size={16} className="spin" /> Creating account…</>
-              : <><UserPlus size={16} /> Create free account</>
+              ? <><Loader2 size={16} className="spin" /> Создание аккаунта…</>
+              : <><UserPlus size={16} /> Создать бесплатный аккаунт</>
             }
           </button>
         </form>
 
         <p className="auth-footer">
-          Already have an account?{' '}
-          <Link href="/login">Sign in</Link>
+          Уже есть аккаунт?{' '}
+          <Link href="/login">Войти</Link>
         </p>
       </div>
     </div>

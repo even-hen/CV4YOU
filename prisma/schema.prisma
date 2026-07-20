@@ -29,7 +29,7 @@ model User {
   passwordHash              String
   subscriptionTier          SubscriptionTier @default(BASIC)
   subscriptionEndsAt        DateTime?
-  emailNotificationsEnabled Boolean          @default(true)
+  emailNotificationsEnabled Boolean          @default(false)
   minScoreEmailNotif        Int              @default(50)
   preferredTheme            String           @default("dark")
   preferredLanguage         String           @default("Russian")

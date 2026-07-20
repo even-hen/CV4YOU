@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const user = session?.user as any
 
   const searchParams = useSearchParams()
-  const [emailNotif, setEmailNotif] = useState<boolean>(user?.emailNotificationsEnabled ?? true)
+  const [emailNotif, setEmailNotif] = useState<boolean>(user?.emailNotificationsEnabled ?? false)
   const [minScoreNotif, setMinScoreNotif] = useState<number>(user?.minScoreEmailNotif ?? 50)
   const [name, setName] = useState<string>(user?.name || '')
   const [lang, setLang] = useState<string>(user?.preferredLanguage ?? 'Russian')
@@ -48,13 +48,13 @@ export default function SettingsPage() {
       window.history.replaceState({}, document.title, window.location.pathname)
       setTimeout(() => setSaved(false), 3000)
     } else if (hhResult === 'error') {
-      setError('Failed to connect your HeadHunter account. Please try again.')
+      setError('Не удалось подключить ваш аккаунт HeadHunter. Пожалуйста, попробуйте еще раз.')
       window.history.replaceState({}, document.title, window.location.pathname)
     }
   }, [searchParams])
 
   async function handleHhDisconnect() {
-    if (!confirm('Are you sure you want to disconnect HeadHunter? This will unlink all mapped vacancies.')) return
+    if (!confirm('Вы уверены, что хотите отключить HeadHunter? Это разорвет связь со всеми связанными вакансиями.')) return
     setHhDisconnecting(true)
     setError('')
     try {
@@ -63,7 +63,7 @@ export default function SettingsPage() {
       setHhConnected(false)
       setHhEmployerId(null)
     } catch {
-      setError('Failed to disconnect HeadHunter integration. Please try again.')
+      setError('Не удалось отключить интеграцию с HeadHunter. Пожалуйста, попробуйте еще раз.')
     } finally {
       setHhDisconnecting(false)
     }
@@ -82,18 +82,31 @@ export default function SettingsPage() {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch {
-      setError('Failed to save settings. Please try again.')
+      setError('Не удалось сохранить настройки. Пожалуйста, попробуйте еще раз.')
     } finally {
       setSaving(false)
     }
   }
 
+  const LANGUAGES = [
+    { value: 'Russian', label: 'Русский' },
+    { value: 'English', label: 'Английский' },
+    { value: 'Kazakh', label: 'Казахский' },
+    { value: 'Uzbek', label: 'Узбекский' },
+    { value: 'Belarusian', label: 'Белорусский' },
+    { value: 'Ukrainian', label: 'Украинский' },
+    { value: 'German', label: 'Немецкий' },
+    { value: 'French', label: 'Французский' },
+    { value: 'Spanish', label: 'Испанский' },
+    { value: 'Chinese', label: 'Китайский' },
+  ]
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6" style={{ flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Settings</h1>
-          <p className="text-muted text-sm mt-2">Manage your profile and notification preferences</p>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Настройки</h1>
+          <p className="text-muted text-sm mt-2">Управляйте вашим профилем и настройками уведомлений</p>
         </div>
       </div>
 
@@ -101,12 +114,12 @@ export default function SettingsPage() {
 
       {/* Profile */}
       <div className="settings-section">
-        <h2 className="settings-section-title">Profile</h2>
+        <h2 className="settings-section-title">Профиль</h2>
 
         <div className="settings-row">
           <div>
-            <div className="settings-row-label">Full name</div>
-            <div className="settings-row-desc">Your display name in the dashboard</div>
+            <div className="settings-row-label">Полное имя</div>
+            <div className="settings-row-desc">Ваше имя, отображаемое в панели</div>
           </div>
           <input
             type="text"
@@ -114,22 +127,22 @@ export default function SettingsPage() {
             style={{ maxWidth: 240 }}
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="Your name"
+            placeholder="Ваше имя"
           />
         </div>
 
         <div className="settings-row">
           <div>
-            <div className="settings-row-label">Email address</div>
-            <div className="settings-row-desc">Used for account login and notifications</div>
+            <div className="settings-row-label">Электронная почта</div>
+            <div className="settings-row-desc">Используется для входа в аккаунт и уведомлений</div>
           </div>
           <span className="text-muted text-sm">{user?.email}</span>
         </div>
 
         <div className="settings-row">
           <div>
-            <div className="settings-row-label">AI evaluation language</div>
-            <div className="settings-row-desc">Language used by AI to analyze CVs and write summaries</div>
+            <div className="settings-row-label">Язык оценки ИИ</div>
+            <div className="settings-row-desc">Язык, используемый ИИ для анализа резюме и составления саммари</div>
           </div>
           <select
             className="form-input"
@@ -137,29 +150,71 @@ export default function SettingsPage() {
             value={lang}
             onChange={e => setLang(e.target.value)}
           >
-            {['Russian', 'English', 'Kazakh', 'Uzbek', 'Belarusian', 'Ukrainian', 'German', 'French', 'Spanish', 'Chinese'].map(l => (
-              <option key={l} value={l}>{l}</option>
+            {LANGUAGES.map(l => (
+              <option key={l.value} value={l.value}>{l.label}</option>
             ))}
           </select>
         </div>
       </div>
 
+      {/* HeadHunter Integration */}
+      <div className="settings-section">
+        <h2 className="settings-section-title">Интеграции</h2>
+        <div className="settings-row">
+          <div>
+            <div className="settings-row-label">HeadHunter (hh.ru)</div>
+            <div className="settings-row-desc">
+              {hhLoading ? (
+                'Загрузка статуса…'
+              ) : hhConnected ? (
+                <>Подключено {hhEmployerId && `(ID Работодателя: ${hhEmployerId})`}</>
+              ) : (
+                'Подключите ваш аккаунт HeadHunter для связывания и синхронизации вакансий'
+              )}
+            </div>
+          </div>
+          {!hhLoading && (
+            hhConnected ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', gap: 5 }}
+                onClick={handleHhDisconnect}
+                disabled={hhDisconnecting}
+              >
+                {hhDisconnecting ? <Loader2 size={13} className="spin" /> : <Unlink size={13} />}
+                Отключить
+              </button>
+            ) : (
+              <a
+                href="/api/integrations/hh/authorize"
+                className="btn btn-secondary btn-sm"
+                style={{ gap: 5 }}
+              >
+                <Link2 size={13} />
+                Подключить аккаунт
+              </a>
+            )
+          )}
+        </div>
+      </div>
+
       {/* Notifications */}
       <div className="settings-section">
-        <h2 className="settings-section-title">Notifications</h2>
+        <h2 className="settings-section-title">Уведомления</h2>
 
         <div className="settings-row">
           <div>
-            <div className="settings-row-label">Email notifications</div>
+            <div className="settings-row-label">Email-уведомления</div>
             <div className="settings-row-desc">
-              Receive an email when a new candidate submits an application
+              Получать уведомления на email o новых откликах
             </div>
           </div>
           <label className="toggle" style={{ flexShrink: 0 }}>
             <input
               type="checkbox"
               checked={emailNotif}
-              onChange={e => setEmailNotif(e.target.checked)}
+              onChange={e => setEmailNotif(e.target.disabled)}
             />
             <span className="toggle-track" />
             <span className="toggle-thumb" />
@@ -169,9 +224,9 @@ export default function SettingsPage() {
         {emailNotif && (
           <div className="settings-row">
             <div>
-              <div className="settings-row-label">Email score threshold</div>
+              <div className="settings-row-label">Порог оценки для email</div>
               <div className="settings-row-desc">
-                Only receive email alerts for applications with a score at or above this level
+                Получать email-уведомления только о кандидатах с оценкой не ниже указанной
               </div>
             </div>
             <select
@@ -188,66 +243,10 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* Subscription info */}
-      <div className="settings-section">
-        <h2 className="settings-section-title">Subscription</h2>
-        <div className="settings-row">
-          <div>
-            <div className="settings-row-label">Current plan</div>
-            <div className="settings-row-desc">
-              {user?.subscriptionTier === 'PRO' ? 'Pro Plan — up to 30 active vacancies' : 'Basic Plan — up to 10 active vacancies'}
-            </div>
-          </div>
-          <a href="/dashboard/billing" className="btn btn-secondary btn-sm">Manage billing</a>
-        </div>
-      </div>
-
-      {/* HeadHunter Integration */}
-      <div className="settings-section">
-        <h2 className="settings-section-title">Integrations</h2>
-        <div className="settings-row">
-          <div>
-            <div className="settings-row-label">HeadHunter (hh.ru)</div>
-            <div className="settings-row-desc">
-              {hhLoading ? (
-                'Loading status…'
-              ) : hhConnected ? (
-                <>Connected {hhEmployerId && `(Employer ID: ${hhEmployerId})`}</>
-              ) : (
-                'Connect your HeadHunter account to link and sync vacancies'
-              )}
-            </div>
-          </div>
-          {!hhLoading && (
-            hhConnected ? (
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', gap: 5 }}
-                onClick={handleHhDisconnect}
-                disabled={hhDisconnecting}
-              >
-                {hhDisconnecting ? <Loader2 size={13} className="spin" /> : <Unlink size={13} />}
-                Disconnect
-              </button>
-            ) : (
-              <a
-                href="/api/integrations/hh/authorize"
-                className="btn btn-secondary btn-sm"
-                style={{ gap: 5 }}
-              >
-                <Link2 size={13} />
-                Connect account
-              </a>
-            )
-          )}
-        </div>
-      </div>
-
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, alignItems: 'center' }}>
-        {saved && <span className="text-sm" style={{ color: 'var(--color-success)' }}>✓ Saved successfully</span>}
+        {saved && <span className="text-sm" style={{ color: 'var(--color-success)' }}>✓ Успешно сохранено</span>}
         <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-          {saving ? <><Loader2 size={15} className="spin" /> Saving…</> : <><Save size={15} /> Save</>}
+          {saving ? <><Loader2 size={15} className="spin" /> Сохранение…</> : <><Save size={15} /> Сохранить</>}
         </button>
       </div>
     </div>

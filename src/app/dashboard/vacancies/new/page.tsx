@@ -1,4 +1,4 @@
-export const metadata = { title: 'New Vacancy' }
+export const metadata = { title: 'Новая вакансия' }
 
 import VacancyForm from '@/components/VacancyForm'
 

@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
         email,
         passwordHash,
         subscriptionTier: 'BASIC',
-        emailNotificationsEnabled: true,
-        preferredTheme: 'dark',
+        emailNotificationsEnabled: false,
+        preferredTheme: 'hh',
       },
     })
 

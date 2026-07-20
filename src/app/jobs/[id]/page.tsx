@@ -79,7 +79,7 @@ export default function JobPage() {
     setExtracting(false)
 
     if (result.error || !result.text) {
-      setFileError(result.error || 'Could not extract text from the file. Please try a different file.')
+      setFileError(result.error || 'Не удалось извлечь текст из файла. Пожалуйста, попробуйте другой файл.')
       setFile(null)
       return
     }
@@ -113,7 +113,7 @@ export default function JobPage() {
     setSubmitError('')
 
     if (!extractedText) {
-      setSubmitError('Please upload your CV before submitting.')
+      setSubmitError('Пожалуйста, загрузите резюме перед отправкой.')
       return
     }
 
@@ -121,12 +121,12 @@ export default function JobPage() {
     if (vacancy) {
       for (const c of vacancy.requestedContacts) {
         if (!contacts[c]?.trim()) {
-          setSubmitError(`Please provide your ${c === 'phone' ? 'phone number' : c === 'telegram' ? 'Telegram' : 'email address'}.`)
+          setSubmitError(`Пожалуйста, укажите ваш ${c === 'phone' ? 'номер телефона' : c === 'telegram' ? 'Telegram' : 'адрес электронной почты'}.`)
           return
         }
       }
       if (vacancy.salaryExpectation === 'required' && !salaryExpectation.trim()) {
-        setSubmitError('Please provide your salary expectation.')
+        setSubmitError('Пожалуйста, укажите ваши ожидания по зарплате.')
         return
       }
     }
@@ -154,7 +154,7 @@ export default function JobPage() {
 
       if (!res.ok) {
         setSubmitState('error')
-        setSubmitError(data.error || 'Submission failed. Please try again.')
+        setSubmitError(data.error || 'Отправка не удалась. Пожалуйста, попробуйте еще раз.')
         return
       }
 
@@ -165,7 +165,7 @@ export default function JobPage() {
       }
     } catch {
       setSubmitState('error')
-      setSubmitError('Network error. Please check your connection and try again.')
+      setSubmitError('Сетевая ошибка. Пожалуйста, проверьте подключение к сети и попробуйте еще раз.')
     }
   }
 
@@ -176,21 +176,21 @@ export default function JobPage() {
       <div className="job-page-shell">
         <div className="job-loading">
           <div className="spinner" />
-          <p>Loading vacancy…</p>
+          <p>Загрузка вакансии…</p>
         </div>
       </div>
     )
   }
 
-  if (loadState === 'not_found') return <JobStatusPage icon="🔍" title="Vacancy not found" body="This position doesn't exist or has been removed." />
-  if (loadState === 'closed') return <JobStatusPage icon="🔒" title="Applications closed" body="The recruiter has temporarily closed applications for this position. Please check back later." />
-  if (loadState === 'error') return <JobStatusPage icon="⚠️" title="Something went wrong" body="We couldn't load this vacancy. Please try again later." />
+  if (loadState === 'not_found') return <JobStatusPage icon="🔍" title="Вакансия не найдена" body="Эта вакансия не существует или была удалена." />
+  if (loadState === 'closed') return <JobStatusPage icon="🔒" title="Прием откликов закрыт" body="Рекрутер временно закрыл прием откликов на эту вакансию. Пожалуйста, зайдите позже." />
+  if (loadState === 'error') return <JobStatusPage icon="⚠️" title="Что-то пошло не так" body="Не удалось загрузить эту вакансию. Пожалуйста, попробуйте позже." />
 
   if (submitState === 'success') return (
     <JobStatusPage
       icon={<CheckCircle2 size={52} color="var(--color-success)" />}
-      title="Application submitted!"
-      body="Thank you for applying. The recruiter will review your CV and may reach out to you."
+      title="Отклик отправлен!"
+      body="Спасибо за отклик! Рекрутер рассмотрит ваше резюме и при необходимости свяжется с вами."
       highlight
     />
   )
@@ -198,8 +198,8 @@ export default function JobPage() {
   if (submitState === 'knocked_out') return (
     <JobStatusPage
       icon={<AlertCircle size={52} color="var(--color-warning)" />}
-      title="Thank you for your interest"
-      body="Unfortunately, your application doesn't meet all the requirements for this position at this time. We appreciate your interest and wish you the best in your job search."
+      title="Спасибо за ваш интерес"
+      body="К сожалению, ваш отклик не соответствует всем требованиям к данной вакансии на данный момент. Мы ценим ваш интерес и желаем успехов в поиске работы."
     />
   )
 
@@ -207,6 +207,10 @@ export default function JobPage() {
 
   return (
     <div className="job-page-shell">
+      <nav className="navbar" style={{ width: '100%' }}>
+        <div className="navbar-logo">📋 CV4YOU</div>
+      </nav>
+
       {/* Header */}
       <header className="job-header">
         <div className="job-title-block">
@@ -218,16 +222,16 @@ export default function JobPage() {
       <div className="job-content">
         {/* Application form */}
         <form onSubmit={handleSubmit} className="job-card">
-          <h2 className="job-section-title">Apply for this position</h2>
+          <h2 className="job-section-title">Откликнуться на вакансию</h2>
 
           {/* Full name */}
           <div className="job-form-group">
             <label className="job-label">
-              <User size={14} /> Full Name *
+              <User size={14} /> Полное имя *
             </label>
             <input
               className="job-input"
-              placeholder="Your full name"
+              placeholder="Ваше полное имя"
               value={candidateName}
               onChange={e => setCandidateName(e.target.value)}
               required
@@ -238,7 +242,7 @@ export default function JobPage() {
           {vacancy.requestedContacts.includes('phone') && (
             <div className="job-form-group">
               <label className="job-label">
-                <Phone size={14} /> Phone Number *
+                <Phone size={14} /> Номер телефона *
               </label>
               <input
                 className="job-input"
@@ -269,7 +273,7 @@ export default function JobPage() {
           {vacancy.requestedContacts.includes('email') && (
             <div className="job-form-group">
               <label className="job-label">
-                <Mail size={14} /> Email Address *
+                <Mail size={14} /> Электронная почта *
               </label>
               <input
                 className="job-input"
@@ -286,11 +290,11 @@ export default function JobPage() {
           {vacancy.salaryExpectation && vacancy.salaryExpectation !== '' && (
             <div className="job-form-group">
               <label className="job-label">
-                💰 Salary Expectation {vacancy.salaryExpectation === 'required' ? '*' : '(optional)'}
+                💰 Ожидания по зарплате {vacancy.salaryExpectation === 'required' ? '*' : '(необязательно)'}
               </label>
               <input
                 className="job-input"
-                placeholder="e.g. 150 000 ₽/month"
+                placeholder="например, 150 000 ₽/мес"
                 value={salaryExpectation}
                 onChange={e => setSalaryExpectation(e.target.value)}
                 required={vacancy.salaryExpectation === 'required'}
@@ -301,8 +305,8 @@ export default function JobPage() {
           {/* CV upload */}
           <div className="job-form-group">
             <label className="job-label">
-              <FileText size={14} /> CV / Resume *
-              <span className="job-label-hint"> PDF or TXT, max 1 MB</span>
+              <FileText size={14} /> Резюме *
+              <span className="job-label-hint"> PDF или TXT, до 1 МБ</span>
             </label>
 
             {!file ? (
@@ -314,8 +318,8 @@ export default function JobPage() {
                 onDrop={handleDrop}
               >
                 <UploadCloud size={36} className="job-dropzone-icon" />
-                <p className="job-dropzone-text">Drag & drop your CV here, or <span className="job-dropzone-link">browse</span></p>
-                <p className="job-dropzone-hint">PDF or TXT · max 1 MB</p>
+                <p className="job-dropzone-text">Перетащите ваше резюме сюда или <span className="job-dropzone-link">выберите на устройстве</span></p>
+                <p className="job-dropzone-hint">PDF или TXT · до 1 МБ</p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -329,7 +333,7 @@ export default function JobPage() {
                 {extracting ? (
                   <div className="job-file-extracting">
                     <Loader2 size={18} className="spin" />
-                    <span>Extracting text from {file.name}…</span>
+                    <span>Извлечение текста из {file.name}…</span>
                   </div>
                 ) : (
                   <>
@@ -339,8 +343,8 @@ export default function JobPage() {
                         <div className="job-file-name">{file.name}</div>
                         <div className="job-file-meta">
                           {(file.size / 1024).toFixed(0)} KB
-                          {pageCount && ` · ${pageCount} page${pageCount !== 1 ? 's' : ''}`}
-                          {extractedText && ` · ${extractedText.split(/\s+/).length.toLocaleString()} words extracted`}
+                          {pageCount && ` · страниц: ${pageCount}`}
+                          {extractedText && ` · слов извлечено: ${extractedText.split(/\s+/).length.toLocaleString()}`}
                         </div>
                       </div>
                     </div>
@@ -362,8 +366,8 @@ export default function JobPage() {
           {/* Additional Questions (Knockout) */}
           {vacancy.knockoutQuestions.length > 0 && (
             <div className="job-form-section">
-              <h3 className="job-subsection-title">Additional Questions</h3>
-              <p className="job-subsection-hint">Please answer the following questions about your experience.</p>
+              <h3 className="job-subsection-title">Дополнительные вопросы</h3>
+              <p className="job-subsection-hint">Пожалуйста, ответьте на следующие вопросы о вашем опыте.</p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginTop: 16 }}>
                 {vacancy.knockoutQuestions.map((q, qi) => (
@@ -405,14 +409,14 @@ export default function JobPage() {
             disabled={submitState === 'submitting' || extracting || !extractedText}
           >
             {submitState === 'submitting' ? (
-              <><Loader2 size={18} className="spin" /> Submitting application…</>
+              <><Loader2 size={18} className="spin" /> Отправка отклика…</>
             ) : (
-              <>Submit Application <ChevronRight size={18} /></>
+              <>Отправить отклик <ChevronRight size={18} /></>
             )}
           </button>
           {!extractedText && !extracting && (
             <p style={{ textAlign: 'center', fontSize: '0.8125rem', color: 'var(--color-text-subtle)', marginTop: 8 }}>
-              Please upload your CV to enable submission
+              Пожалуйста, загрузите резюме, чтобы отправить отклик
             </p>
           )}
         </form>
@@ -420,7 +424,7 @@ export default function JobPage() {
 
       {/* Footer */}
       <footer className="job-footer">
-        <p>Powered by <strong>CV4YOU</strong> · Applications are processed securely</p>
+        <p>Работает на <strong>CV4YOU</strong> · Отклики обрабатываются безопасно</p>
       </footer>
     </div>
   )
@@ -440,6 +444,9 @@ function JobStatusPage({
 }) {
   return (
     <div className="job-page-shell">
+      <nav className="navbar" style={{ width: '100%' }}>
+        <div className="navbar-logo">📋 CV4YOU</div>
+      </nav>
       <div className="job-status-page">
         <div className="job-status-icon">{icon}</div>
         <h1 className={`job-status-title${highlight ? ' highlight' : ''}`}>{title}</h1>
